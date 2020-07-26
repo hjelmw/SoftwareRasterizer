@@ -1,3 +1,11 @@
+//////////////////////////////////////////////////////////////////
+///							ParameterEquation
+///
+/// Interpolates color on point in triangle
+///
+//////////////////////////////////////////////////////////////////
+
+
 #pragma once
 
 #include "EdgeEquation.hpp"
@@ -19,10 +27,14 @@ public:
 		const EdgeEquation& e2,
 		float area);
 
+	/// Evaluate the parameter equation for the given point.
 	float evaluate(float x, float y) const;
 
+	/// Step the equation value v to the x direction.
 	float stepX(float v) const;
 	float stepX(float v, float stepSize) const;
+
+	/// Step the equation value v to the y direction.
 	float stepY(float v) const;
 	float stepY(float v, float stepSize) const;
 };
