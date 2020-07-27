@@ -24,6 +24,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\ParameterEquation.cpp" />
     <ClCompile Include="src\PixelData.cpp" />
+    <ClCompile Include="src\PixelShaderBase.cpp" />
     <ClCompile Include="src\TriangleEquations.cpp" />
     <ClCompile Include="src\Vector.cpp" />
   </ItemGroup>
@@ -32,6 +33,8 @@
     <ClInclude Include="src\EdgeEquation.hpp" />
     <ClInclude Include="src\ParameterEquation.hpp" />
     <ClInclude Include="src\PixelData.hpp" />
+    <ClInclude Include="src\PixelShader.hpp" />
+    <ClInclude Include="src\PixelShaderBase.hpp" />
     <ClInclude Include="src\TriangleEquations.hpp" />
     <ClInclude Include="src\Vertex.hpp" />
   </ItemGroup>
