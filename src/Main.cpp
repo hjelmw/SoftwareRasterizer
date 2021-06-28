@@ -11,6 +11,7 @@ SDL_Surface* m_surface;
 void putpixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
 {
 	int bpp = surface->format->BytesPerPixel;
+
 	/* Here p is the address to the pixel we want to set */
 	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 
@@ -56,9 +57,9 @@ void drawTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2)
 	// Clip to scissor rect.
 
 	minX = std::max(minX, 0);
-	maxX = std::min(maxX, 640);
+	maxX = std::min(maxX, 768);
 	minY = std::max(minY, 0);
-	maxY = std::min(maxY, 480);
+	maxY = std::min(maxY, 640);
 
 	// Compute edge equations.
 
@@ -187,11 +188,11 @@ int main(int argc, char* argv[])
 	SDL_Init(SDL_INIT_VIDEO);
 
 	SDL_Window* window = SDL_CreateWindow(
-		"Williams sjuka rasterizer",
+		"Software Rasterizer",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
+		768,
 		640,
-		480,
 		0
 	);
 
@@ -203,10 +204,20 @@ int main(int argc, char* argv[])
 	//Vertex v2(0.6, 0.7, 0, 0, 0, 255);
 
 	Vertex v0(100.0f, 200.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-	Vertex v1(450.0f, 400.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	Vertex v1(250.0f, 400.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	Vertex v2(100.0f, 420.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 
+	Vertex v3(650.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+	Vertex v4(740.0f, 200.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	Vertex v5(590.0f, 220.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+
+	Vertex v6(420.0f, 400.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+	Vertex v7(440.0f, 600.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	Vertex v8(290.0f, 640.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+
 	drawTriangle(v0, v1, v2);
+	drawTriangle(v3, v4, v5);
+	drawTriangle(v6, v7, v8);
 
 	SDL_UpdateWindowSurface(window);
 
