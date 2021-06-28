@@ -43,8 +43,6 @@ void putpixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
 	}
 }
 
-/// Legacy
-/*
 void drawTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2)
 {
 	// Compute triangle bounding box.
@@ -92,94 +90,6 @@ void drawTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2)
 				putpixel(m_surface, x, y, color);
 			}
 		}
-}
-*/
-
-
-void drawTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2)
-{
-	// Compute triangle equations
-	TriangleEquations eqn(v0, v1, v2);
-
-	// Check if triangle back-facing
-	if (eqn.area > 0)
-		return;
-
-
-	// Compute triangle bounding box and clip to scissor rect.
-	int minX = std::min(std::min(v0.x, v1.x), v2.x);
-	int maxX = std::max(std::max(v0.x, v1.x), v2.x);
-	int minY = std::min(std::min(v0.y, v1.y), v2.y);
-	int maxY = std::max(std::max(v0.y, v1.y), v2.y);
-
-	
-	// Clip to scissor rect.
-	minX = std::max(minX, 0);
-	maxX = std::min(maxX, 640);
-	minY = std::max(minY, 0);
-	maxY = std::min(maxY, 480);
-
-	
-	int blockSize = 32;
-
-	// Round to block grid.
-	minX = minX & ~(blockSize - 1);
-	maxX = maxX & ~(blockSize - 1);
-	minY = minY & ~(blockSize - 1);
-	maxY = maxY & ~(blockSize - 1);
-
-	float s = (float)blockSize - 1;
-
-	// Add 0.5 to sample at pixel centers.
-	for (float x = minX + 0.5f, xm = maxX + 0.5f; x <= xm; x += 1.0f)
-		for (float y = minY + 0.5f, ym = maxY + 0.5f; y <= ym; y += 1.0f)
-		{
-			EdgeData e00;
-			e00.init(eqn, x, y);
-
-			EdgeData e01 = e00;
-			e01.stepY(eqn, s);
-			EdgeData e10 = e00;
-			e10.stepX(eqn, s);
-			EdgeData e11 = e01;
-			e11.stepX(eqn, s);
-
-			bool e00_0 = eqn.e0.test(e00.ev0), e00_1 = eqn.e1.test(e00.ev1), e00_2 = eqn.e2.test(e00.ev2), e00_all = e00_0 && e00_1 && e00_2;
-			bool e01_0 = eqn.e0.test(e01.ev0), e01_1 = eqn.e1.test(e01.ev1), e01_2 = eqn.e2.test(e01.ev2), e01_all = e01_0 && e01_1 && e01_2;
-			bool e10_0 = eqn.e0.test(e10.ev0), e10_1 = eqn.e1.test(e10.ev1), e10_2 = eqn.e2.test(e10.ev2), e10_all = e10_0 && e10_1 && e10_2;
-			bool e11_0 = eqn.e0.test(e11.ev0), e11_1 = eqn.e1.test(e11.ev1), e11_2 = eqn.e2.test(e11.ev2), e11_all = e11_0 && e11_1 && e11_2;
-
-			int result = e00_all + e01_all + e10_all + e11_all;
-
-
-			if (result == 0)
-			{
-				// Test for special case.
-
-				bool e00Same = e00_0 == e00_1 == e00_2;
-				bool e01Same = e01_0 == e01_1 == e01_2;
-				bool e10Same = e10_0 == e10_1 == e10_2;
-				bool e11Same = e11_0 == e11_1 == e11_2;
-
-				if (!e00Same || !e01Same || !e10Same || !e11Same)
-				{
-					//PixelShader::template drawBlock<true>(eqn, x, y);
-				}
-			}
-			else if (result == 4)
-			{
-				// Fully Covered
-
-				//rasterizeBlock<false>(eqn, x, y);
-			}
-			else
-			{
-				// Partially Covered
-
-				//rasterizeBlock<true>(eqn, x, y);
-			}
-		}
-
 }
 
 
