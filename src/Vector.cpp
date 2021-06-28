@@ -3,13 +3,13 @@
 
 	Vertex::Vertex(float x, float y, float z, float r, float g, float b)
 	{
-		x = x;
-		y = y;
-		z = z;
+		this->x = x;
+		this->y = y;
+		this->z = z;
 
-		r = r;
-		g = g;
-		b = b;
+		this->r = r;
+		this->g = g;
+		this->b = b;
 
 	}
 

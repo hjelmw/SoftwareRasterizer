@@ -2,15 +2,15 @@
 
 EdgeEquation::EdgeEquation(const Vertex& v0, const Vertex& v1)
 {
-	a = v0.y - v1.y;
-	b = v1.x - v0.x;
-	c = -(a * (v0.x + v1.x) + b * (v0.y + v1.y)) / 2;
-	tie = a != 0 ? a > 0 : b > 0;
+	this->a = v0.y - v1.y;
+	this->b = v1.x - v0.x;
+	this->c = -(a * (v0.x + v1.x) + b * (v0.y + v1.y)) / 2;
+	this->tie = a != 0 ? a > 0 : b > 0;
 }
 
-float EdgeEquation::evaluate(float x, float y) const
+float EdgeEquation::evaluate(float x, float y)
 {
-	return a * x + b * y + c;
+	return this->a * x + this->b * y + c;
 }
 
 bool EdgeEquation::test(float x, float y)
@@ -20,7 +20,7 @@ bool EdgeEquation::test(float x, float y)
 
 float EdgeEquation::test(float v)
 {
-	return (v > 0 || v == 0 && tie);
+	return (v > 0 || v == 0 && this->tie);
 }
 
 

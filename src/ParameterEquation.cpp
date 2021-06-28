@@ -11,14 +11,14 @@ ParameterEquation::ParameterEquation(
 {
 	float factor = 1.0f / (2.0f * area);
 
-	a = factor * (p0 * e0.a + p1 * e1.a + p2 * e2.a);
-	b = factor * (p0 * e0.b + p1 * e1.b + p2 * e2.b);
-	c = factor * (p0 * e0.c + p1 * e1.c + p2 * e2.c);
+	this->a = factor * (p0 * e0.a + p1 * e1.a + p2 * e2.a);
+	this->b = factor * (p0 * e0.b + p1 * e1.b + p2 * e2.b);
+	this->c = factor * (p0 * e0.c + p1 * e1.c + p2 * e2.c);
 }
 
 float ParameterEquation::evaluate(float x, float y) const
 {
-	return a * x + b * y + c;
+	return this->a * x + this->b * y + this->c;
 }
 
 /// Step the equation value v to the x direction.
