@@ -14,9 +14,9 @@ public:
 	EdgeEquation() = default;
 	EdgeEquation(const Vertex& v0, const Vertex& v1);
 
-	float evaluate(float x, float y);
-	bool test(float x, float y);
-	float test(float v);
+	float evaluate(float x, float y) const;
+	bool test(float x, float y) const;
+	float test(float v) const;
 
 	float stepX(float v) const;
 	float stepX(float v, float stepSize) const;
