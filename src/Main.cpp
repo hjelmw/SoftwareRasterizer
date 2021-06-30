@@ -1,6 +1,5 @@
 #include "Vertex.hpp"
 #include "TriangleEquations.hpp"
-#include "EdgeData.hpp"
 #include "SDL.h"
 
 #include <algorithm>
@@ -108,20 +107,15 @@ int main(int argc, char* argv[])
 
 	m_surface = SDL_GetWindowSurface(window);
 
-
-	//Vertex v0(0.5, 0.1, 0, 255, 0, 0);
-	//Vertex v1(0.1, 0.5, 0, 0, 255, 0);
-	//Vertex v2(0.6, 0.7, 0, 0, 0, 255);
-
-	Vertex v0(100.0f, 200.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-	Vertex v1(250.0f, 400.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	Vertex v2(100.0f, 420.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	Vertex v0(100.0f, 200.0f, 00.0f, 1.0f, 0.0f, 0.0f);
+	Vertex v1(250.0f, 400.0f, 00.0f, 0.0f, 1.0f, 0.0f);
+	Vertex v2(100.0f, 420.0f, 00.0f, 0.0f, 0.0f, 1.0f);
 
 	Vertex v3(650.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f);
 	Vertex v4(740.0f, 200.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	Vertex v5(590.0f, 220.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	Vertex v5(590.0f, 200.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 
-	Vertex v6(420.0f, 400.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+	Vertex v6(400.0f, 300.0f, 0.0f, 1.0f, 0.0f, 0.0f);
 	Vertex v7(440.0f, 600.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	Vertex v8(290.0f, 640.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 
