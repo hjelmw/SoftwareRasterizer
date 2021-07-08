@@ -10,4 +10,4 @@ include_directories("${CMAKE_SOURCE_DIR}/src/")
 
 file(GLOB SOURCES src/*)
 add_executable(Rasterizer ${SOURCES})
-target_link_libraries(Rasterizer ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+target_link_libraries(Rasterizer ${SDL2_LIBRARIES})

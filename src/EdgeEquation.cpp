@@ -1,4 +1,6 @@
 #include "EdgeEquation.hpp"
+#include "EdgeData.hpp"
+
 
 EdgeEquation::EdgeEquation(const Vertex& v0, const Vertex& v1)
 {
@@ -8,17 +10,17 @@ EdgeEquation::EdgeEquation(const Vertex& v0, const Vertex& v1)
 	this->tie = a != 0 ? a > 0 : b > 0;
 }
 
-float EdgeEquation::evaluate(float x, float y)
+float EdgeEquation::evaluate(float x, float y) const
 {
 	return this->a * x + this->b * y + c;
 }
 
-bool EdgeEquation::test(float x, float y)
+bool EdgeEquation::test(float x, float y) const
 {
 	return test(evaluate(x, y));
 }
 
-float EdgeEquation::test(float v)
+float EdgeEquation::test(float v) const
 {
 	return (v > 0 || v == 0 && this->tie);
 }
