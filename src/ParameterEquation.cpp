@@ -7,9 +7,9 @@ ParameterEquation::ParameterEquation(
 	const EdgeEquation& e0,
 	const EdgeEquation& e1,
 	const EdgeEquation& e2,
-	float area)
+	float factor)
 {
-	float factor = 1.0f / (2.0f * area);
+	//float factor = 1.0f / (2.0f * area);
 
 	this->a = factor * (p0 * e0.a + p1 * e1.a + p2 * e2.a);
 	this->b = factor * (p0 * e0.b + p1 * e1.b + p2 * e2.b);
