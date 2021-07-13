@@ -5,11 +5,18 @@
 class PixelData
 {
 public:
-	float r;
-	float g;
-	float b;
+	float x; /// pixel x coordinate in triangle.
+	float y; /// pixel y coordinate in triangle.
 
-	void init(const TriangleEquations &eqn, float x, float y);
-	void stepX(const TriangleEquations &eqn);
-	void stepY(const TriangleEquations& eqn);
+	float z; // triangle interpolated z value.
+	float w; // triangle interpolated w value.
+	float invw; // triangle interpolated 1 / w value.
+
+	// Per pixel variable
+	float var[16];
+
+	PixelData();
+	PixelData(const TriangleEquations &teqn, float x, float y, int varCount, bool interpolateZ, bool interpolateW);
+	void stepX(const TriangleEquations &teqn, int varCount, bool interpolateZ, bool interpolateW);
+	void stepY(const TriangleEquations &teqn, int varCount, bool interpolateZ, bool interpolateW);
 };

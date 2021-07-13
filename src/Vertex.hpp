@@ -7,12 +7,12 @@ public:
 	float x;
 	float y;
 	float z;
+	float w;
 
-	float r;
-	float g;
-	float b;
+	/// Maximum per vertex variables used for interpolation across the triangle.
+	float var[16];
 
-	Vertex(float x, float y, float z, float r, float g, float b);
+	Vertex(float x, float y, float z, float w, float r, float g, float b);
 
 	// Vertex operations
 	//Vertex operator+(const Vertex& rhs);

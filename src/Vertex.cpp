@@ -1,16 +1,16 @@
 
 #include "Vertex.hpp"
 
-	Vertex::Vertex(float x, float y, float z, float r, float g, float b)
+	Vertex::Vertex(float x, float y, float z, float w, float r, float g, float b)
 	{
 		this->x = x;
 		this->y = y;
 		this->z = z;
+		this->w = w;
 
-		this->r = r;
-		this->g = g;
-		this->b = b;
-
+		this->var[0] = r;
+		this->var[1] = g;
+		this->var[2] = b;
 	}
 
 	//Vertex Vertex::operator+(const Vertex& rhs)
