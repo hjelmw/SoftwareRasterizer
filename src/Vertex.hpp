@@ -12,6 +12,7 @@ public:
 	/// Maximum per vertex variables used for interpolation across the triangle.
 	float var[16];
 
+	Vertex();
 	Vertex(float x, float y, float z, float w, float r, float g, float b);
 
 	// Vertex operations

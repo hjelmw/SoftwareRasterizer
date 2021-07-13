@@ -1,14 +1,5 @@
-#include "Vertex.hpp"
-
-#include <Rasterizer.hpp>
-#include "PixelShaderBase.hpp"
-
-#include "TriangleEquations.hpp"
-#include "EdgeData.hpp"
-#include "PixelData.hpp"
-
-#include <algorithm>
 #include "SDL.h"
+#include <Rasterizer.hpp>
 
 
 
@@ -53,28 +44,36 @@ int main(int argc, char* argv[])
 	m_surface = SDL_GetWindowSurface(window);
 	BasicPixelShader::surface = m_surface;
 
-	Vertex v0(100.0f, 200.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-	Vertex v1(250.0f, 400.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	Vertex v2(100.0f, 420.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	Vertex v0, v1, v2;
 
-	Vertex v3(650.0f, 100.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-	Vertex v4(740.0f, 200.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	Vertex v5(590.0f, 200.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	v0.x = 100.0f;
+	v0.y = 200.0f;
+	v0.z = 0.0f;
+	v0.var[0] = 1.0f;
+	v0.var[1] = 0.0f;
+	v0.var[2] = 0.0f;
 
-	Vertex v6(400.0f, 300.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-	Vertex v7(440.0f, 600.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	Vertex v8(290.0f, 640.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	v1.x = 250.0f;
+	v1.y = 100.0f;
+	v1.z = 0.0f;
+	v1.var[0] = 0.0f;
+	v1.var[1] = 1.0f;
+	v1.var[2] = 0.0f;
+
+	v2.x = 100.0f;
+	v2.y = 420.0f;
+	v2.z = 0.0f;
+	v2.var[0] = 0.0f;
+	v2.var[1] = 0.0f;
+	v2.var[2] = 1.0f;
+
 
 	Rasterizer r;
 
 	r.setScissorRect(0, 0, 768, 640);
 	r.setPixelShader<BasicPixelShader>();
 
-
 	r.drawTriangle(v0, v1, v2);
-	r.drawTriangle(v3, v4, v5);
-	r.drawTriangle(v6, v7, v8);
-
 
 	SDL_UpdateWindowSurface(window);
 
