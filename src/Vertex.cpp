@@ -7,6 +7,12 @@ Vertex::Vertex()
 	this->y = 0;
 	this->z = 0;
 	this->w = 0;
+
+	this->r = 0; 
+	this->g = 0; 
+	this->b = 0;
+
+	this->var[8] = { };
 }
 
 Vertex::Vertex(float x, float y, float z, float w, float r, float g, float b)
@@ -16,9 +22,12 @@ Vertex::Vertex(float x, float y, float z, float w, float r, float g, float b)
 	this->z = z;
 	this->w = w;
 
-	this->var[0] = r;
-	this->var[1] = g;
-	this->var[2] = b;
+	this->r = r;
+	this->g = g;
+	this->b = b;
+
+	// Filled out by vertex shader
+	this->var[8] = { };
 }
 
 //Vertex Vertex::operator+(const Vertex& rhs)

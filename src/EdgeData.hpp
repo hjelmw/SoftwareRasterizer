@@ -10,7 +10,7 @@ public:
     float ev2;
 
     /// Initialize the edge data values.
-    void init(const TriangleEquations& teqn, float x, float y);
+    EdgeData(const TriangleEquations& teqn, float x, float y);
 
     /// Step the edge values in the x direction.
     void stepX(const TriangleEquations& teqn);

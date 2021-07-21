@@ -1,7 +1,7 @@
 #include "EdgeData.hpp"
 
 /// Initialize the edge data values.
-void EdgeData::init(const TriangleEquations& teqn, float x, float y)
+EdgeData::EdgeData(const TriangleEquations& teqn, float x, float y)
 {
     this->ev0 = teqn.e0.evaluate(x, y);
     this->ev1 = teqn.e1.evaluate(x, y);
