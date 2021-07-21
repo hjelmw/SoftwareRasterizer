@@ -1,11 +1,32 @@
+//#define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
+//#include "tiny_obj_loader.hpp"
+
 #include "SDL.h"
 #include <Rasterizer.hpp>
-
+#include<vector>
 
 
 static SDL_Surface* m_surface;
 
-class BasicPixelShader : public PixelShaderBase<BasicPixelShader> {
+class BasicVertexShader : public VertexShaderBase<BasicVertexShader> {
+public:
+	static const int attribCount = 1;
+	static const int varCount = 3;
+
+	static void processVertex(Vertex* in[], Vertex* out)
+	{
+		const Vertex* data = static_cast<const Vertex*>(in[0]);
+		out->x = data->x;
+		out->y = data->y;
+		out->z = data->z;
+		out->w = 1.0f;
+		out->var[0] = data->r;
+		out->var[1] = data->g;
+		out->var[2] = data->b;
+	}
+};
+
+class BasicFragmentShader : public FragmentShaderBase<BasicFragmentShader> {
 public:
 	static const bool interpolateZ = false;
 	static const bool interpolateW = false;
@@ -13,7 +34,7 @@ public:
 
 	static SDL_Surface* surface;
 
-	static void drawPixel(const PixelData& p)
+	static void drawPixel(const FragmentData& p)
 	{
 		int rint = (int)(p.var[0] * 255);
 		int gint = (int)(p.var[1] * 255);
@@ -26,7 +47,7 @@ public:
 	}
 };
 
-SDL_Surface* BasicPixelShader::surface;
+SDL_Surface* BasicFragmentShader::surface;
 
 int main(int argc, char* argv[])
 {
@@ -42,40 +63,61 @@ int main(int argc, char* argv[])
 	);
 
 	m_surface = SDL_GetWindowSurface(window);
-	BasicPixelShader::surface = m_surface;
+	BasicFragmentShader::surface = m_surface;
 
-	Vertex v0, v1, v2;
+	Rasterizer::VertexData vdata[3];
 
-	v0.x = 100.0f;
-	v0.y = 200.0f;
-	v0.z = 0.0f;
-	v0.var[0] = 1.0f;
-	v0.var[1] = 0.0f;
-	v0.var[2] = 0.0f;
+	vdata[0].x = 100.0f;
+	vdata[0].y = 400.0f;
+	vdata[0].z = 100.0f;
+	vdata[0].w = 1.0f;
+	vdata[0].r = 1.0f;
+	vdata[0].g = 0.0f;
+	vdata[0].b = 0.0f;
 
-	v1.x = 250.0f;
-	v1.y = 100.0f;
-	v1.z = 0.0f;
-	v1.var[0] = 0.0f;
-	v1.var[1] = 1.0f;
-	v1.var[2] = 0.0f;
 
-	v2.x = 100.0f;
-	v2.y = 420.0f;
-	v2.z = 0.0f;
-	v2.var[0] = 0.0f;
-	v2.var[1] = 0.0f;
-	v2.var[2] = 1.0f;
+	vdata[1].x = 400.0f;
+	vdata[1].y = 100.0f;
+	vdata[1].z = 0.0f;
+	vdata[1].w = 1.0f;
+	vdata[1].r = 0.0f;
+	vdata[1].g = 1.0f;
+	vdata[1].b = 0.0f;
 
+	vdata[2].x = 600.0f;
+	vdata[2].y = 400.0f;
+	vdata[2].z = 0.0f;
+	vdata[2].w = 1.0f;
+	vdata[2].r = 0.0f;
+	vdata[2].g = 0.0f;
+	vdata[2].b = 1.0f;
+
+	int idata[3];
+	idata[0] = 0;
+	idata[1] = 1;
+	idata[2] = 2;
 
 	Rasterizer r;
 
 	r.setScissorRect(0, 0, 768, 640);
-	r.setPixelShader<BasicPixelShader>();
+	r.setFragmentShader<BasicFragmentShader>();
+	r.setVertexShader<BasicVertexShader>();
+	r.setVertexAttribPointer(0, sizeof(Rasterizer::VertexData), vdata);
 
-	r.drawTriangle(v0, v1, v2);
+	r.drawElements(3, idata);
+	//r.drawTriangle(v0, v1, v2);
 
 	SDL_UpdateWindowSurface(window);
+
+	//std::string inputfile = "../data/box.obj";
+	//tinyobj::attrib_t attrib;
+	//std::vector<tinyobj::shape_t> shapes;
+	//std::vector<tinyobj::material_t> materials;
+
+	//std::string warn;
+	//std::string err;
+
+	//bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, inputfile.c_str());
 
 	SDL_Event e;
 	while (SDL_WaitEvent(&e) && e.type != SDL_QUIT);

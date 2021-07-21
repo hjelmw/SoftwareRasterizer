@@ -1,33 +1,89 @@
 #pragma once
 
+#include "SDL.h"
 
 #include <algorithm>
+#include <vector>
+
+#include "Vertex.hpp"
 
 #include "EdgeEquation.hpp"
 #include "ParameterEquation.hpp"
 #include "TriangleEquations.hpp"
-#include "PixelData.hpp"
+#include "FragmentData.hpp"
 #include "EdgeData.hpp"
-#include "PixelShaderBase.hpp"
 
-#pragma warning (disable: 6294 6201)
+#include "FragmentShaderBase.hpp"
+#include "VertexShaderBase.hpp"
 
 // Rasterizer main class.
 class Rasterizer
 {
 private:
+	SDL_Window* m_window;
+
 	int m_minX;
 	int m_maxX;
 	int m_minY;
 	int m_maxY;
 
-	void (Rasterizer::*m_triangleFunc)(const Vertex& v0, const Vertex& v1, const Vertex& v2) const;
+	// Fragment and vertex shaders should be defined and set by user.
+	void (Rasterizer::*m_fragmentFunc)(const Vertex& v0, const Vertex& v1, const Vertex& v2) const;
+	void (*m_vertexFunc)(Vertex* in[], Vertex *out);
 
+	int m_attribCount;
+	int m_vertexVarCount;
+
+	struct Attribute {
+		const void* buffer;
+		int stride;
+	} m_attributes[8];
+
+	mutable std::vector<Vertex> m_verticesOut; // Output from vertex shader
+	mutable std::vector<int> m_indicesOut; // 
 public:
-	/// Constructor.
+	struct VertexData {
+		float x, y, z, w;
+		float r, g, b;
+	};
+
+
 	Rasterizer() {};
 
-	/// Set the scissor rectangle.
+	/// Constructor.
+	Rasterizer(int width, int height) 
+	{
+		this->m_minX = 0;
+		this->m_minY = 0;
+		this->m_maxX = 0;
+		this->m_maxY = 0;
+
+		this->m_vertexVarCount = 0;
+		this->m_attribCount = 0;
+
+		SDL_Init(SDL_INIT_VIDEO);
+		createWindow(width, height, "Software Renderer");
+		setScissorRect(0, 0, width, height);
+	};
+
+	void createWindow(int width, int height, char* name)
+	{
+		SDL_Window* window = SDL_CreateWindow(
+			name,
+			SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_UNDEFINED,
+			width,
+			height,
+			0
+		);
+	}
+
+	SDL_Surface* getWindowSurface(SDL_Window* window) const
+	{
+		return SDL_GetWindowSurface(window);
+	}
+
+	// Set the scissor rectangle.
 	void setScissorRect(int x, int y, int width, int height)
 	{
 		this->m_minX = x;
@@ -36,30 +92,105 @@ public:
 		this->m_maxY = y + height;
 	}
 
-	/// Set the pixel shader.
-	template <class PixelShader>
-	void setPixelShader()	
+	// Set the pixel shader.
+	template <class FragmentShader>
+	void setFragmentShader()	
 	{
-		this->m_triangleFunc = &Rasterizer::drawTriangleBlockTemplate<PixelShader>;
+		this->m_fragmentFunc = &Rasterizer::drawTriangleBlockTemplate<FragmentShader>;
+	}
+
+	// Set the vertex shader
+	template <class VertexShader>
+	void setVertexShader()
+	{
+		this->m_vertexVarCount = VertexShader::varCount;
+		this->m_attribCount = VertexShader::attribCount;
+		this->m_vertexFunc = &VertexShader::processVertex;
+	}
+
+	// Specify structure of vertex array
+	void setVertexAttribPointer(int index, int stride, const void* buffer)
+	{
+		m_attributes[index].buffer = buffer;
+		m_attributes[index].stride = stride;
+	}
+
+	void processVertices(int count, int* indices, std::vector<Vertex> verticesIn, std::vector<int> indicesIn)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			int index = indices[i];
+			int outputIndex = (int)m_verticesOut.size();
+
+			// max 8 per vertex attributes
+			Vertex* vIn[8];
+
+			for (int j = 0; j < m_attribCount; ++j)
+			{
+				int offset = m_attributes[j].stride * index;
+				vIn[j] = (Vertex*)((char*)m_attributes[j].buffer + (int)offset);
+			}
+
+			this->m_indicesOut.push_back(outputIndex);
+			this->m_verticesOut.resize(m_verticesOut.size() + 1);
+
+			Vertex& vOut = m_verticesOut.back();
+			processVertex(vIn, &vOut);
+		}
+	}
+
+	void processVertex(Vertex* in[], Vertex *out)
+	{
+		(*m_vertexFunc)(in, out);
+	}
+	
+	// Compute fragments (in this case pixels) and run a fragment shader
+	void processFragments(const Vertex* vertices, int* indices, int indexCount) const
+	{
+		for (size_t i = 0; i + 3 <= indexCount; i += 3) {
+			if (indices[i] == -1)
+				continue;
+			drawTriangle(vertices[indices[i]], vertices[indices[i + 1]], vertices[indices[i + 2]]);
+		}
 	}
 
 	// Draw a single triangle.
 	void drawTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2) const
 	{
-		(this->*m_triangleFunc)(v0, v1, v2);
+		(this->*m_fragmentFunc)(v0, v1, v2);
+	}
+
+	void displayFragments() const
+	{
+		SDL_UpdateWindowSurface(this->m_window);
+	}
+
+	// Draw a list of primitives (triangles)
+	void drawElements(int count, int *indices)
+	{
+		m_verticesOut.clear();
+		m_indicesOut.clear();
+		
+		/* 
+
+		// Process the input indices and run a vertex shader on each vertex.
+		// Process the vertices to figure out which triangles cover fragments,
+		// then run a fragment shader for each. 
+		// Finally the manipulated surface is displayed on screen
+
+		*/
+
+		processVertices(count, indices, m_verticesOut, m_indicesOut);
+		processFragments(&m_verticesOut[0], &m_indicesOut[0], (int) m_indicesOut.size());
+		//displayFragments();
 	}
 
 private:
-	bool scissorTest(float x, float y) const
-	{
-		return (x >= m_minX && x < m_maxX&& y >= m_minY && y < m_maxY);
-	}
-
-	template <class PixelShader>
+	template <class FragmentShader>
 	void drawTriangleBlockTemplate(const Vertex& v0, const Vertex& v1, const Vertex& v2) const
 	{
 		// Compute triangle equations.
-		TriangleEquations teqn(v0, v1, v2, PixelShader::varCount);
+		TriangleEquations teqn(v0, v1, v2, FragmentShader::varCount);
 
 		// Check if triangle is backfacing.
 		if (teqn.area <= 0)
@@ -105,7 +236,7 @@ private:
 			float yf = y + 0.5f;
 
 			// Test if block is inside or outside triangle or touches it.
-			EdgeData e00; e00.init(teqn, xf, yf);
+			EdgeData e00(teqn, xf, yf);
 			EdgeData e01 = e00; e01.stepY(teqn, s);
 			EdgeData e10 = e00; e10.stepX(teqn, s);
 			EdgeData e11 = e01; e11.stepX(teqn, s);
@@ -127,17 +258,17 @@ private:
 				bool e11Same = e11_0 == e11_1 == e11_2;
 
 				if (!e00Same || !e01Same || !e10Same || !e11Same)
-					PixelShader::template drawBlock<true>(teqn, x, y);
+					FragmentShader::template drawBlock<true>(teqn, x, y);
 			}
 			else if (result == 4)
 			{
 				// Fully Covered.
-				PixelShader::template drawBlock<false>(teqn, x, y);
+				FragmentShader::template drawBlock<false>(teqn, x, y);
 			}
 			else
 			{
 				// Partially Covered.
-				PixelShader::template drawBlock<true>(teqn, x, y);
+				FragmentShader::template drawBlock<true>(teqn, x, y);
 			}
 		}
 	}

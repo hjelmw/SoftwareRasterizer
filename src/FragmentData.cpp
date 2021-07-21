@@ -1,8 +1,8 @@
 
-#include "PixelData.hpp"
+#include "FragmentData.hpp"
 
 
-PixelData::PixelData()
+FragmentData::FragmentData()
 {
 	this->x = 0.0f;
 	this->y = 0.0f;
@@ -14,8 +14,8 @@ PixelData::PixelData()
 
 }
 
-/// Initialize pixel data for the given pixel coordinates.
-PixelData::PixelData(const TriangleEquations& teqn, float x, float y, int varCount, bool interpolateZ, bool interpolateW)
+/// Initialize fragment (pixel) data for the given pixel coordinates.
+FragmentData::FragmentData(const TriangleEquations& teqn, float x, float y, int varCount, bool interpolateZ, bool interpolateW)
 {
 	// Default values
 	this->x = x;
@@ -38,8 +38,8 @@ PixelData::PixelData(const TriangleEquations& teqn, float x, float y, int varCou
 	
 }
 
-/// Step all the pixel data in the x direction.
-void PixelData::stepX(const TriangleEquations& teqn, int varCount, bool interpolateZ, bool interpolateW)
+/// Step all the fragment data in the x direction.
+void FragmentData::stepX(const TriangleEquations& teqn, int varCount, bool interpolateZ, bool interpolateW)
 {
 	if (interpolateZ)
 		this->z = teqn.z.stepX(z);
@@ -54,8 +54,8 @@ void PixelData::stepX(const TriangleEquations& teqn, int varCount, bool interpol
 		this->var[i] = teqn.var[i].stepX(var[i]);
 }
 
-/// Step all the pixel data in the y direction.
-void PixelData::stepY(const TriangleEquations& teqn, int varCount, bool interpolateZ, bool interpolateW)
+/// Step all the fragment data in the y direction.
+void FragmentData::stepY(const TriangleEquations& teqn, int varCount, bool interpolateZ, bool interpolateW)
 {
 	if (interpolateZ)
 		this->z = teqn.z.stepY(z);

@@ -2,7 +2,7 @@
 
 #include "TriangleEquations.hpp"
 
-class PixelData
+class FragmentData
 {
 public:
 	float x; /// pixel x coordinate in triangle.
@@ -15,8 +15,8 @@ public:
 	// Per pixel variable
 	float var[16];
 
-	PixelData();
-	PixelData(const TriangleEquations &teqn, float x, float y, int varCount, bool interpolateZ, bool interpolateW);
+	FragmentData();
+	FragmentData(const TriangleEquations &teqn, float x, float y, int varCount, bool interpolateZ, bool interpolateW);
 	void stepX(const TriangleEquations &teqn, int varCount, bool interpolateZ, bool interpolateW);
 	void stepY(const TriangleEquations &teqn, int varCount, bool interpolateZ, bool interpolateW);
 };
