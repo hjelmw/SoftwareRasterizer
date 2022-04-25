@@ -1,19 +1,14 @@
-# 3D-Rasterizer
+# CPU 3D Rasterizer/Renderer
 
-# Introduction
-To better understand how computer graphics work I decided to build a software renderer/rasterizer. For simplicity it will run on the CPU.
+To better understand how computer graphics work I decided to build my own _software_ renderer using rasterization as a hobby project.
 
-# Rasterization (according to Wikipedia)
-> The process of taking an image described in a vector graphics format (vertices) and converting it into a raster image, i.e a series of pixels, dots or lines, which, when displayed together, create the image which was represented via shapes.
+**3D Rendering** is the process of generating a digital 3-dimensional image, often for use in games or movies. One common way of doing this is through rasterization. **A rasterizer** is a program that takes, as an input, an image described as triangle vertices and converts them into a raster imge, i.e the corresponding pixels that the triangle would cover on a computer display. 
 
-[link](https://en.wikipedia.org/wiki/Rasterisation)
+While developing I mostly followed Trenki's excellent blog post on [developing a software renderer](https://trenki2.github.io/blog/2017/06/06/developing-a-software-renderer-part1/). If you also want to build your own I highly recommend reading it!
+
+## Installation
+TBC
 
 
-# Checklist
-
-- [ ] Render a 3D model
-- [ ] Proper matrix translation/rotation
-- [ ] Texture mapping
-- [ ] Maybe some simple effects (shadow maps, lighting)
-- [ ] Shaders?
-- [ ] Come up with a cooler project name
+## Pictures
+TBC
