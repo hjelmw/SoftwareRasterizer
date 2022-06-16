@@ -2,9 +2,14 @@
 //#include "tiny_obj_loader.hpp"
 
 #include "SDL.h"
-#include <Rasterizer.hpp>
+#include "Rasterizer.hpp"
+#include "VectorMath.hpp"
+
 #include<vector>
 
+typedef vmath::vec3<float> vec3f;
+typedef vmath::vec4<float> vec4f;
+typedef vmath::mat4<float> mat4f;
 
 static SDL_Surface* m_surface;
 
@@ -13,16 +18,21 @@ public:
 	static const int attribCount = 1;
 	static const int varCount = 3;
 
+	static mat4f modelViewProjectionMatrix;
+
 	static void processVertex(Vertex* in[], Vertex* out)
 	{
-		const Vertex* data = static_cast<const Vertex*>(in[0]);
-		out->x = data->x;
-		out->y = data->y;
-		out->z = data->z;
-		out->w = 1.0f;
-		out->var[0] = data->r;
-		out->var[1] = data->g;
-		out->var[2] = data->b;
+		const Vertex* vertexData = in[0];
+
+		vec4f position = modelViewProjectionMatrix * vec4f(vertexData->x, vertexData->y, vertexData->z, vertexData->w);
+
+		out->x = position.x;
+		out->y = position.y;
+		out->z = position.z;
+		out->w = position.w;
+		out->var[0] = vertexData->r;
+		out->var[1] = vertexData->g;
+		out->var[2] = vertexData->b;
 	}
 };
 
@@ -104,6 +114,11 @@ int main(int argc, char* argv[])
 	r.setVertexShader<BasicVertexShader>();
 	r.setVertexAttribPointer(0, sizeof(Rasterizer::VertexData), vdata);
 
+
+	mat4f lookAtMatrix = vmath::lookat_matrix(vec3f(3.0f, 2.0f, 5.0f), vec3f(0.0f), vec3f(0.0f, 1.0f, 0.0f));
+	mat4f perspectiveMatrix = vmath::perspective_matrix(60.0f, 4.0f / 3.0f, 0.1f, 10.0f);
+	BasicVertexShader::modelViewProjectionMatrix = lookAtMatrix * perspectiveMatrix;
+
 	r.drawElements(3, idata);
 	//r.drawTriangle(v0, v1, v2);
 
@@ -118,6 +133,7 @@ int main(int argc, char* argv[])
 	//std::string err;
 
 	//bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, inputfile.c_str());
+
 
 	SDL_Event e;
 	while (SDL_WaitEvent(&e) && e.type != SDL_QUIT);

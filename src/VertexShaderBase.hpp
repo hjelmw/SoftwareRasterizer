@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vertex.hpp"
+#include "VectorMath.hpp"
 
 /// Base class for vertex shaders.
 /** Derive your own vertex shaders from this class and redefine AttribCount etc. */
