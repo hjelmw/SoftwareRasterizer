@@ -4,7 +4,9 @@
 #include "VectorMath.hpp"
 
 /// Base class for vertex shaders.
-/** Derive your own vertex shaders from this class and redefine AttribCount etc. */
+
+/** Derive your own vertex shaders from this class and redefine attribCount etc. */
+
 template <class Derived>
 class VertexShaderBase {
 public:
@@ -16,7 +18,7 @@ public:
 
 	/// Process a single vertex.
 	/** Implement this in your own vertex shader. */
-	static void processVertex(Vertex* in[], Vertex out)
+	static void processVertex(void* in[], Vertex out)
 	{
 
 	}

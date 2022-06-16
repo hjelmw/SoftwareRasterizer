@@ -19,18 +19,5 @@ public:
 	Vertex();
 	Vertex(float x, float y, float z, float w, float r, float g, float b);
 
-	// Input for vertex shader input is an array of vertex atrib pointers
-	typedef const void* VertexShaderInput[8];
-	// Output for vertex shader is a vertex
-	typedef Vertex VertexShaderOutput;
-
-	// Vertex operations
-	//Vertex operator+(const Vertex& rhs);
-	//Vertex operator-(const Vertex& rhs);
-	//Vertex operator*(const Vertex& rhs);
-
-	//Vertex operator/(const double& rhs);
-	//Vertex operator*(const double& rhs);
-	//bool operator==(const Vertex& rhs)const;
-	//float dotProduct(const Vertex& rhs);
+	bool operator==(Vertex const& rhs) const { return this->x == rhs.x && this->y == rhs.y && this->z == rhs.z; }
 };

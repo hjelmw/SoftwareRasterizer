@@ -5,9 +5,11 @@
 
 #pragma warning (disable: 6201 6294) 
 
-/// Pixel shader base class.
-/** Derive your own pixel shaders from this class and redefine the static
+/// Fragment shader base class.
+
+/* Derive your own pixel shaders from this class and redefine the static
 	variables to match your pixel shader requirements. */
+
 template <class Derived>
 class FragmentShaderBase {
 public:
@@ -20,62 +22,13 @@ public:
 	/// Tells the rasterizer how many per vertex vars to interpolate.
 	static const int varCount = 3;
 
-	template <bool TestEdges>
-	static void drawBlock(const TriangleEquations& teqn, int x, int y)
-	{
-		float xf = x + 0.5f;
-		float yf = y + 0.5f;
-
-		FragmentData po(teqn, xf, yf, Derived::varCount, Derived::interpolateZ, Derived::interpolateW);
-
-		EdgeData eo(teqn, xf, yf);
-
-		int blockSize = 8;
-
-		for (int yy = y; yy < y + blockSize; yy++)
-		{
-			FragmentData pi = copyFragmentData(po);
-
-			EdgeData ei(teqn, xf, yf);
-			if (TestEdges)
-				ei = eo;
-
-			for (int xx = x; xx < x + blockSize; xx++)
-			{
-				if (!TestEdges || ei.test(teqn))
-				{
-					pi.x = (float) xx;
-					pi.y = (float) yy;
-					Derived::drawPixel(pi);
-				}
-
-				pi.stepX(teqn, Derived::varCount, Derived::interpolateZ, Derived::interpolateW);
-				if (TestEdges)
-					ei.stepX(teqn);
-			}
-
-			po.stepY(teqn, Derived::varCount, Derived::interpolateZ, Derived::interpolateW);
-			if (TestEdges)
-				eo.stepY(teqn);
-		}
-	}
 	/// This is called per pixel. 
 	/** Implement this in your derived class to display single pixels. */
-	static void drawPixel(const FragmentData& p)
+	static void processFragment(const FragmentData& p)
 	{
 
 	}
 
-protected:
-	static FragmentData copyFragmentData(FragmentData& po)
-	{
-		FragmentData pi;
-		if (Derived::interpolateZ) pi.z = po.z;
-		if (Derived::interpolateW) { pi.w = po.w; pi.invw = po.invw; }
-		for (int i = 0; i < Derived::varCount; ++i)
-			pi.var[i] = po.var[i];
-		return pi;
-	}
-
-	class NullFragmentShader : public FragmentShaderBase<NullFragmentShader> {};
 };
+
+class NullFragmentShader : public FragmentShaderBase<NullFragmentShader> {};

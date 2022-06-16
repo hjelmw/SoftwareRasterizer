@@ -10,8 +10,6 @@ FragmentData::FragmentData()
 	this->w = 0.0f;
 
 	this->invw = 0.0f;
-
-
 }
 
 /// Initialize fragment (pixel) data for the given pixel coordinates.
@@ -19,7 +17,7 @@ FragmentData::FragmentData(const TriangleEquations& teqn, float x, float y, int 
 {
 	// Default values
 	this->x = x;
-	this->y = x;
+	this->y = y;
 	this->z = 0.0f;
 	this->w = 0.0f;
 	this->invw = 0.0f;
@@ -51,7 +49,7 @@ void FragmentData::stepX(const TriangleEquations& teqn, int varCount, bool inter
 	}
 
 	for (int i = 0; i < varCount; ++i)
-		this->var[i] = teqn.var[i].stepX(var[i]);
+		this->var[i] = teqn.var[i].stepX(var[i]) * w;
 }
 
 /// Step all the fragment data in the y direction.
@@ -67,5 +65,5 @@ void FragmentData::stepY(const TriangleEquations& teqn, int varCount, bool inter
 	}
 
 	for (int i = 0; i < varCount; ++i)
-		this->var[i] = teqn.var[i].stepY(var[i]);
+		this->var[i] = teqn.var[i].stepY(var[i]) * w;
 }
