@@ -35,35 +35,3 @@ FragmentData::FragmentData(const TriangleEquations& teqn, float x, float y, int 
 		this->var[i] = teqn.var[i].evaluate(x, y);
 	
 }
-
-/// Step all the fragment data in the x direction.
-void FragmentData::stepX(const TriangleEquations& teqn, int varCount, bool interpolateZ, bool interpolateW)
-{
-	if (interpolateZ)
-		this->z = teqn.z.stepX(z);
-
-	if (interpolateW || varCount > 0)
-	{
-		this->invw = teqn.invw.stepX(invw);
-		this->w = 1.0f / invw;
-	}
-
-	for (int i = 0; i < varCount; ++i)
-		this->var[i] = teqn.var[i].stepX(var[i]) * w;
-}
-
-/// Step all the fragment data in the y direction.
-void FragmentData::stepY(const TriangleEquations& teqn, int varCount, bool interpolateZ, bool interpolateW)
-{
-	if (interpolateZ)
-		this->z = teqn.z.stepY(z);
-
-	if (interpolateW || varCount > 0)
-	{
-		this->invw = teqn.invw.stepY(invw);
-		this->w = 1.0f / invw;
-	}
-
-	for (int i = 0; i < varCount; ++i)
-		this->var[i] = teqn.var[i].stepY(var[i]) * w;
-}

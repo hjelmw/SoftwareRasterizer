@@ -97,6 +97,7 @@ private:
 	mutable std::vector<Vertex> m_VerticesOut;
 	mutable std::vector<int> m_VertexIndicesOut;
 
+	float* m_DepthBuffer;
 
 	/* Structs and public functions */
 public:
@@ -129,7 +130,7 @@ public:
 	void setDepthRange(float near, float far);
 
 
-	/* Note: Template functions need to be defined in the header  */
+	/* Note: Template functions need to be defined in the header file */
 
 	// Set the pixel shader using c++ template magic.
 	template <class FragmentShader>
@@ -205,15 +206,23 @@ private:
 		maxY = std::min(maxY, m_MaxY);
 
 		// Add 0.5 to sample at pixel centers.
-		for (float x = minX + 0.5f, xm = maxX + 0.5f; x <= xm; x += 1.0f)
-		for (float y = minY + 0.5f, ym = maxY + 0.5f; y <= ym; y += 1.0f)
+		for (float y = minY + 0.5f; y <= maxY + 0.5f; y += 1.0f)
+		for (float x = minX + 0.5f; x <= maxX + 0.5f; x += 1.0f)
 		{
 			if (teqn.e0.test(x, y) && teqn.e1.test(x, y) && teqn.e2.test(x, y))
 			{
-				FragmentData pixelData = FragmentData(teqn, x, y, FragmentShader::varCount, FragmentShader::interpolateZ, FragmentShader::interpolateW);
-				FragmentShader::processFragment(pixelData);
-			}
+				float currentDepthAtPixel = m_DepthBuffer[(int) (y * 800 + x)];
+				FragmentData fragmentData = FragmentData(teqn, x, y, FragmentShader::varCount, FragmentShader::interpolateZ, FragmentShader::interpolateW);
 
+				// Only draw fragment if its depth is above (in front) what is currently stored.
+				if (fragmentData.z < currentDepthAtPixel)
+				{
+					FragmentShader::processFragment(fragmentData);
+
+					// Update current stored depth at this pixel
+					this->m_DepthBuffer[(int) (y * 800 + x)] = fragmentData.z;
+				}
+			}
 		}
 	}
 };

@@ -5,8 +5,8 @@
 /* TriangleEquations
 *
 * This class contains 3 classes that together encapsulates a mathematical representation of a triangle
-* 
-*
+* And functions to test points against them.
+* It also implements interpolation of points inside them using barycentric coordinates for arbitrary vertex values
 *
 */
 
@@ -28,11 +28,6 @@ public:
 	float evaluate(float x, float y) const;
 	bool test(float x, float y) const;
 	float test(float v) const;
-
-	float stepX(float v) const;
-	float stepX(float v, float stepSize) const;
-	float stepY(float v) const;
-	float stepY(float v, float stepSize) const;
 };
 
 class ParameterEquation
@@ -53,11 +48,6 @@ public:
 		float area);
 
 	float evaluate(float x, float y) const;
-
-	float stepX(float v) const;
-	float stepX(float v, float stepSize) const;
-	float stepY(float v) const;
-	float stepY(float v, float stepSize) const;
 };
 
 class TriangleEquations

@@ -26,35 +26,6 @@ float EdgeEquation::test(float v) const
 	return (v > 0 || v == 0 && this->tie);
 }
 
-
-/// Step the equation value v to the x direction.
-
-float EdgeEquation::stepX(float v) const
-{
-	return v + a;
-}
-
-/// Step the equation value v to the x direction.
-
-float EdgeEquation::stepX(float v, float stepSize) const
-{
-	return v + a * stepSize;
-}
-
-/// Step the equation value v to the y direction.
-
-float EdgeEquation::stepY(float v) const
-{
-	return v + b;
-}
-
-/// Step the equation value vto the y direction.
-
-float EdgeEquation::stepY(float v, float stepSize) const
-{
-	return v + b * stepSize;
-}
-
 ParameterEquation::ParameterEquation(
 	float p0,
 	float p1,
@@ -65,7 +36,7 @@ ParameterEquation::ParameterEquation(
 	float factor)
 {
 
-	// Solve interpolation equation
+	// Solve interpolation equation using barycentric coordinates
 	this->a = factor * (p0 * e0.a + p1 * e1.a + p2 * e2.a);
 	this->b = factor * (p0 * e0.b + p1 * e1.b + p2 * e2.b);
 	this->c = factor * (p0 * e0.c + p1 * e1.c + p2 * e2.c);
@@ -74,30 +45,6 @@ ParameterEquation::ParameterEquation(
 float ParameterEquation::evaluate(float x, float y) const
 {
 	return this->a * x + this->b * y + this->c;
-}
-
-/// Step the equation value v to the x direction.
-float ParameterEquation::stepX(float v) const
-{
-	return v + a;
-}
-
-/// Step the equation value v to the x direction.
-float ParameterEquation::stepX(float v, float stepSize) const
-{
-	return v + a * stepSize;
-}
-
-/// Step the equation value v to the y direction.
-float ParameterEquation::stepY(float v) const
-{
-	return v + b;
-}
-
-/// Step the equation value vto the y direction.
-float ParameterEquation::stepY(float v, float stepSize) const
-{
-	return v + b * stepSize;
 }
 
 TriangleEquations::TriangleEquations(const Vertex& v0, const Vertex& v1, const Vertex& v2, int varCount)

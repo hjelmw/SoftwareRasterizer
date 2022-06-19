@@ -39,8 +39,8 @@ public:
 
 class BasicFragmentShader : public FragmentShaderBase<BasicFragmentShader> {
 public:
-	static const bool interpolateZ = false;
-	static const bool interpolateW = false;
+	static const bool interpolateZ = true;
+	static const bool interpolateW = true;
 	static const int varCount = 5;
 
 	static SDL_Surface* surface;
@@ -79,8 +79,8 @@ int main(int argc, char* argv[])
 		"Software Rasterizer",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		640,
-		480,
+		800,
+		600,
 		0
 	);
 
@@ -135,17 +135,17 @@ int main(int argc, char* argv[])
 	idata2[1] = 1;
 	idata2[2] = 2;
 
-	Rasterizer r;
+	Rasterizer r = Rasterizer();
 
-	r.setScissorRect(0, 0, 640, 480);
-	r.setViewport(0, 0, 640, 480);
+	r.setScissorRect(0, 0, 800, 600);
+	r.setViewport(0, 0, 800, 600);
 	r.setDepthRange(0.0f, 1.0f);
 	r.setVertexShader<BasicVertexShader>();
 	r.setFragmentShader<BasicFragmentShader>();
 	//r.setVertexAttribPointer(0, sizeof(Rasterizer::VertexData), vdata);
 
 	mat4f lookAtMatrix = vmath::lookat_matrix(
-		vec3f(3.0f, 1.0f, 2.5f), // Camera position XYZ
+		vec3f(2.0f, 1.0f, 1.5f), // Camera position XYZ
 		vec3f(0.0f, 0.0f, 0.0f), // Look at origin
 		vec3f(0.0f, 1.0f, 0.0f)); // Y-axis up
 	mat4f perspectiveMatrix = vmath::perspective_matrix(
@@ -165,6 +165,7 @@ int main(int argc, char* argv[])
 	renderer.LoadModel("data/monkey.obj", "data/box.png", vdata3, idata3);
 
 	r.setVertexAttribPointer(0, sizeof(Rasterizer::VertexArrayData), &vdata3[0]);
+	
 	r.drawTriangles((int) idata3.size(), &idata3[0]);
 
 	SDL_UpdateWindowSurface(window);

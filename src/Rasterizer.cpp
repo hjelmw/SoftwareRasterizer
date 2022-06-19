@@ -19,6 +19,11 @@ Rasterizer::Rasterizer()
 
 	this->m_FragmentShaderFunc = 0;
 	this->m_VertexShaderFunc = 0;
+
+	this->m_DepthBuffer = new float[800*600];
+
+	for (int i = 0; i < 800 * 600; i++)
+		this->m_DepthBuffer[i] = 1.0f;
 }
 
 void Rasterizer::setScissorRect(int x, int y, int width, int height)
@@ -64,9 +69,9 @@ void Rasterizer::sortTriangles() const
 		int current_index = m_VertexIndicesOut[i];
 		for (int j = 0; j < num_vertices - i - 1; j++)
 		{
-			if (m_VerticesOut[j].z < m_VerticesOut[j + 1].z)
+			if (m_VerticesOut[j].z > m_VerticesOut[j + 1].z)
 			{
-
+				//std::swap(m_VerticesOut[j], m_VerticesOut[j + 1]);
 			}
 		}
 	}
@@ -272,8 +277,6 @@ void Rasterizer::drawTriangles(int count, int* indices)
 
 	// Cull backfacing triangles
 	cullBackfacingTriangles();
-
-	sortTriangles();
 
 	// Find which pixels the triangles cover and invoke fragment shaders
 	processFragments();
