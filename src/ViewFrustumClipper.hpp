@@ -10,7 +10,7 @@
 //		Clips triangles against a given plane in view frustum 
 //		to either completely cull or build a new vertex that is inside it
 // 
-//		Heavily inspired by code from Trenkis rasterizer dev blog and 
+//		Heavily inspired by code from Markus Trenkwalder's (Trenki) rasterizer dev blog and 
 //		uses the Sutherland-Hodgeman algorithm https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm
 //
 
