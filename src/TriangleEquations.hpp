@@ -2,13 +2,20 @@
 
 #include "Vertex.hpp"
 
-/* TriangleEquations
-*
-* This class contains 3 classes that together encapsulates a mathematical representation of a triangle
-* And functions to test points against them.
-* It also implements interpolation of points inside them using barycentric coordinates for arbitrary vertex values
-*
-*/
+
+
+//
+//									TriangleEquations
+// 
+//		This class contains 3 other classes that together encapsulates 
+//		a mathematical representation of a triangle.
+// 
+//		It has two main functions which is 
+//			1. to test points in screen space against intersection with vertices
+//			2. Interpolate points inside the triangle using barycentric coordinates
+//
+//
+
 
 
 class EdgeEquation

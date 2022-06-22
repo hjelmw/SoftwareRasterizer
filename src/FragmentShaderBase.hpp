@@ -5,10 +5,18 @@
 
 #pragma warning (disable: 6201 6294) 
 
-/// Fragment shader base class.
 
-/* Derive your own pixel shaders from this class and redefine the static
-	variables to match your pixel shader requirements. */
+
+//
+//					Fragment shader base class. 
+// 
+//		Derive your own pixel shaders from this class and redefine the static
+//		variables to match your pixel shader requirements.
+// 
+//		See Main.cpp for an example
+//
+
+
 
 template <class Derived>
 class FragmentShaderBase {

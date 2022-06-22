@@ -4,6 +4,13 @@
 
 #include <algorithm>
 #include <vector>
+#include <fstream>
+#include <string>
+#include <sstream>
+
+#include <iostream>
+#include <map>
+
 
 
 #include "Vertex.hpp"
@@ -14,9 +21,22 @@
 #include "FragmentShaderBase.hpp"
 #include "VertexShaderBase.hpp"
 
-#include "PolygonClipper.hpp"
+#include "ViewFrustumClipper.hpp"
 
-// Rasterizer main class.
+
+
+//
+//					This is the Rasterizer main class.
+//
+//		The rasterization starting point to look in is DrawTriangles()
+//		It works by following the Graphics Pipeline conceptual model
+//		
+//		It additionally supports arbitrary (and interpolated) per vertex variables 
+//		as well as programmable vertex & fragment shaders!
+//
+
+
+
 class Rasterizer
 {
 
@@ -27,6 +47,12 @@ private:
 	int m_MinY;
 	int m_MaxY;
 
+	// Vector and matrix helpers
+	typedef vmath::vec3<float> vec3f;
+	typedef vmath::vec2<float> vec2f;
+	typedef vmath::vec4<float> vec4f;
+	typedef vmath::mat4<float> mat4f;
+
 	// Fragment and vertex shaders should be defined and set by user.
 	// C++ magic but basically we store these as function pointers so compiler can inline them
 	void (Rasterizer::* m_FragmentShaderFunc)(const Vertex& v0, const Vertex& v1, const Vertex& v2) const;
@@ -34,6 +60,28 @@ private:
 
 	int m_AttribCount;
 	int m_VertexVarCount;
+
+	struct VertexIndexData {
+		unsigned vertexIndex;
+		unsigned normalIndex;
+		unsigned texcoordIndex;
+
+		struct VertexIndexDataCompare {
+			bool operator () (const VertexIndexData& v1, const VertexIndexData& v2) const
+			{
+				if (v1.vertexIndex < v2.vertexIndex) return true;
+				else if (v1.vertexIndex > v2.vertexIndex) return false;
+				else {
+					if (v1.normalIndex < v2.normalIndex) return true;
+					else if (v1.normalIndex > v2.normalIndex) return false;
+					else {
+						if (v1.texcoordIndex < v2.texcoordIndex) return true;
+						else return false;
+					}
+				}
+			}
+		};
+	};
 
 	// Used in transformVertices to perform a viewport transform
 	struct Viewport {
@@ -118,7 +166,7 @@ public:
 
 	/* Rasterizer functions */
 
-	Rasterizer();
+	Rasterizer(const int windowHeight, const int windowWidth);
 
 	// Set the scissor rectangle.
 	void setScissorRect(int x, int y, int width, int height);
@@ -129,6 +177,8 @@ public:
 	// Define near and far plane
 	void setDepthRange(float near, float far);
 
+	// Loads a .obj into struct VertexArrayData
+	void loadModelIntoVertexArray(const char* modelPath, char* texturePath, std::vector<Rasterizer::VertexArrayData>& vertexDataRef, std::vector<int>& indexDataRef);
 
 	/* Note: Template functions need to be defined in the header file */
 
@@ -199,7 +249,7 @@ private:
 		int minY = (int)std::min(std::min(v0.y, v1.y), v2.y);
 		int maxY = (int)std::max(std::max(v0.y, v1.y), v2.y);
 
-		// Clip to scissor rect.
+		// Clip to window dimensions
 		minX = std::max(minX, m_MinX);
 		maxX = std::min(maxX, m_MaxX);
 		minY = std::max(minY, m_MinY);
@@ -211,7 +261,7 @@ private:
 		{
 			if (teqn.e0.test(x, y) && teqn.e1.test(x, y) && teqn.e2.test(x, y))
 			{
-				float currentDepthAtPixel = m_DepthBuffer[(int) (y * 800 + x)];
+				float currentDepthAtPixel = m_DepthBuffer[(int) (y * m_MaxX + x)]; // row * rows + col
 				FragmentData fragmentData = FragmentData(teqn, x, y, FragmentShader::varCount, FragmentShader::interpolateZ, FragmentShader::interpolateW);
 
 				// Only draw fragment if its depth is above (in front) what is currently stored.
@@ -220,7 +270,7 @@ private:
 					FragmentShader::processFragment(fragmentData);
 
 					// Update current stored depth at this pixel
-					this->m_DepthBuffer[(int) (y * 800 + x)] = fragmentData.z;
+					this->m_DepthBuffer[(int) (y * m_MaxX + x)] = fragmentData.z;
 				}
 			}
 		}

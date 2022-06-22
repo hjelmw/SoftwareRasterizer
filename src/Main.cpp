@@ -5,6 +5,10 @@
 #include <stdlib.h>     /* srand, rand */
 #include<vector>
 
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+
+
 class BasicVertexShader : public VertexShaderBase<BasicVertexShader> {
 public:
 	static const int attribCount = 1;
@@ -73,77 +77,24 @@ mat4f BasicVertexShader::modelViewProjectionMatrix;
 
 int main(int argc, char* argv[])
 {
-	SDL_Init(SDL_INIT_VIDEO);
 
+	// Setup window manager
+	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Window* window = SDL_CreateWindow(
 		"Software Rasterizer",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		800,
-		600,
+		WINDOW_WIDTH,
+		WINDOW_HEIGHT,
 		0
 	);
 
-	//SDL_Surface* tmp = IMG_Load("data/box.png");
+	// This is the main buffer we will draw into
+	SDL_Surface* renderSurface = SDL_GetWindowSurface(window);
 
-	SDL_Surface* viewport = SDL_GetWindowSurface(window);
-	BasicFragmentShader::surface = viewport;
-	Rasterizer::VertexData vdata[3];
-	int idata[3];
+	Rasterizer softwareRasterizer(WINDOW_HEIGHT, WINDOW_WIDTH);
 
-	vdata[0].x = 0.0f;
-	vdata[0].y = 0.5f;
-	vdata[0].z = 0.0f;
-	vdata[0].w = 1.0f;
-	vdata[0].r = 1.0f;
-	vdata[0].g = 0.0f;
-	vdata[0].b = 0.0f;
-
-	vdata[1].x = -1.5f;
-	vdata[1].y = -0.5f;
-	vdata[1].z = 0.0f;
-	vdata[1].w = 1.0f;
-	vdata[1].r = 0.0f;
-	vdata[1].g = 1.0f;
-	vdata[1].b = 0.0f;
-
-	vdata[2].x = 1.5f;
-	vdata[2].y = -0.5f;
-	vdata[2].z = 0.0f;
-	vdata[2].w = 1.0f;
-	vdata[2].r = 0.0f;
-	vdata[2].g = 0.0f;
-	vdata[2].b = 1.0f;
-
-	idata[0] = 0;
-	idata[1] = 1;
-	idata[2] = 2;
-
-
-	Rasterizer::VertexArrayData vdata2[3];
-	int idata2[3];
-
-	vdata2[0].vertex = vec3f(0.0f, 0.5f, 0.0f);
-	vdata2[1].vertex = vec3f(-1.5f, -0.5f, 0.0f);
-	vdata2[2].vertex = vec3f(1.5f, -0.5f, 0.0f);
-	
-	vdata2[0].normal = vec3f(1.0f, 0.0f, 0.0f);
-	vdata2[1].normal = vec3f(0.0f, 1.0f, 0.0f);
-	vdata2[2].normal = vec3f(0.0f, 0.0f, 1.0f);
-
-	idata2[0] = 0;
-	idata2[1] = 1;
-	idata2[2] = 2;
-
-	Rasterizer r = Rasterizer();
-
-	r.setScissorRect(0, 0, 800, 600);
-	r.setViewport(0, 0, 800, 600);
-	r.setDepthRange(0.0f, 1.0f);
-	r.setVertexShader<BasicVertexShader>();
-	r.setFragmentShader<BasicFragmentShader>();
-	//r.setVertexAttribPointer(0, sizeof(Rasterizer::VertexData), vdata);
-
+	// Setup matrices
 	mat4f lookAtMatrix = vmath::lookat_matrix(
 		vec3f(2.0f, 1.0f, 1.5f), // Camera position XYZ
 		vec3f(0.0f, 0.0f, 0.0f), // Look at origin
@@ -153,21 +104,28 @@ int main(int argc, char* argv[])
 		4.0f / 3.0f, // Aspect ratio
 		0.1f, // Near plane
 		10.0f); // Far plane
-	BasicVertexShader::modelViewProjectionMatrix = perspectiveMatrix * lookAtMatrix;
-
-	//r.setVertexAttribPointer(0, sizeof(Rasterizer::VertexArrayData), &vdata2[0]);
-	//r.drawTriangles(3, idata2);
-
-	std::vector<Rasterizer::VertexArrayData> vdata3;
-	std::vector<int> idata3;
-
-	Renderer renderer = Renderer();
-	renderer.LoadModel("data/monkey.obj", "data/box.png", vdata3, idata3);
-
-	r.setVertexAttribPointer(0, sizeof(Rasterizer::VertexArrayData), &vdata3[0]);
 	
-	r.drawTriangles((int) idata3.size(), &idata3[0]);
+	// Setup shader constants
+	BasicVertexShader::modelViewProjectionMatrix = perspectiveMatrix * lookAtMatrix;
+	BasicFragmentShader::surface = renderSurface;
 
+	// Configure rasterizer
+	softwareRasterizer.setScissorRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	softwareRasterizer.setViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	softwareRasterizer.setDepthRange(0.0f, 1.0f);
+	softwareRasterizer.setVertexShader<BasicVertexShader>();
+	softwareRasterizer.setFragmentShader<BasicFragmentShader>();
+
+	// Load vertices into rasterizer
+	std::vector<Rasterizer::VertexArrayData> vertexData;
+	std::vector<int> indexData;
+	softwareRasterizer.loadModelIntoVertexArray("data/monkey.obj", "data/box.png", vertexData, indexData);
+	softwareRasterizer.setVertexAttribPointer(0, sizeof(Rasterizer::VertexArrayData), &vertexData[0]);
+
+	// Draw into buffer
+	softwareRasterizer.drawTriangles((int)indexData.size(), &indexData[0]);
+
+	// Flip it!
 	SDL_UpdateWindowSurface(window);
 
 	SDL_Event e;

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "PolygonClipper.hpp"
+#include "ViewFrustumClipper.hpp"
 
-PolygonClipper::PolygonClipper(std::vector<Vertex>* vertices, int i1, int i2, int i3, int varCount)
+ViewFrustumClipper::ViewFrustumClipper(std::vector<Vertex>* vertices, int i1, int i2, int i3, int varCount)
 {
 	m_IndicesIn = new std::vector<int>();
 	m_IndicesOut = new std::vector<int>();
@@ -16,18 +16,18 @@ PolygonClipper::PolygonClipper(std::vector<Vertex>* vertices, int i1, int i2, in
 	this->m_VarCount = varCount;
 }
 
-PolygonClipper::~PolygonClipper()
+ViewFrustumClipper::~ViewFrustumClipper()
 {
 	//delete m_IndicesIn;
 	//delete m_IndicesIn;
 }
 
-std::vector<int>& PolygonClipper::getIndices()
+std::vector<int>& ViewFrustumClipper::getIndices()
 {
 	return *m_IndicesIn;
 }
 
-Vertex PolygonClipper::interpolateVertex(const Vertex &v0, const Vertex &v1, float t, int varCount)
+Vertex ViewFrustumClipper::interpolateVertex(const Vertex &v0, const Vertex &v1, float t, int varCount)
 {
 	Vertex result;
 
@@ -42,12 +42,12 @@ Vertex PolygonClipper::interpolateVertex(const Vertex &v0, const Vertex &v1, flo
 	return result;
 }
 
-bool PolygonClipper::fullyClipped() const
+bool ViewFrustumClipper::fullyClipped() const
 {
 	return m_IndicesIn->size() < 3;
 }
 
-void PolygonClipper::clipToPlane(float a, float b, float c, float d)
+void ViewFrustumClipper::clipToPlane(float a, float b, float c, float d)
 {
 	// All vertices outside frustum, don't do anything
 	if (fullyClipped())
@@ -78,7 +78,7 @@ void PolygonClipper::clipToPlane(float a, float b, float c, float d)
 		// One triangle vertex is on the right side (outside) of clip plane
 		if (sgn(dPlane) != sgn(dPrevPlane))
 		{	
-			// Which vertex is outside?
+			// Which vertex is outside? 
 			float t = dPlane < 0 ? dPrevPlane / (dPrevPlane - dPlane) : -dPrevPlane / (dPlane - dPrevPlane);
 
 			// Create a new vertex on the boundary of the plane

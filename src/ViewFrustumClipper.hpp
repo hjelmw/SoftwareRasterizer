@@ -3,9 +3,23 @@
 #include <vector>
 #include "Vertex.hpp"
 
-class PolygonClipper
+
+
+//
+//							View Frustum culling.
+//		Clips triangles against a given plane in view frustum 
+//		to either completely cull or build a new vertex that is inside it
+// 
+//		Heavily inspired by code from Trenkis rasterizer dev blog and 
+//		uses the Sutherland-Hodgeman algorithm https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm
+//
+
+
+
+class ViewFrustumClipper
 {
 private:
+
 	std::vector<int>* m_IndicesIn;
 	std::vector<int>* m_IndicesOut;
 	std::vector<Vertex> *m_Vertices;
@@ -19,16 +33,15 @@ private:
 	}
 
 public:
-	PolygonClipper(std::vector<Vertex>* vertices, int i1, int i2, int i3, int varCount);
-	~PolygonClipper();
+	ViewFrustumClipper(std::vector<Vertex>* vertices, int i1, int i2, int i3, int varCount);
+	~ViewFrustumClipper();
 
 	std::vector<int>& getIndices();
 
 	// Clip the polygon to the plane given by the formula a * x + b * y + c * z + d * w
-	// and build a new set of vertices inside this frustum
 	void clipToPlane(float a, float b, float c, float d);
 
-	// Polygon is completely outside view frustum
+	// Polygon is completely outside view frustum plane
 	bool fullyClipped() const;
 
 	// Given two vertices. Return a new one with values in between them

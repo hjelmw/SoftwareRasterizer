@@ -5,25 +5,18 @@
 #include "FragmentShaderBase.hpp"
 #include "VertexShaderBase.hpp"
 
-Rasterizer::Rasterizer()
+Rasterizer::Rasterizer(const int windowWidth, const int windowHeight)
 {
-	this->m_MinX = 0;
-	this->m_MinY = 0;
-	this->m_MaxX = 0;
-	this->m_MaxY = 0;
-
 	this->m_VertexVarCount = 0;
 	this->m_AttribCount = 0;
-
 	this->m_Viewport = { 0 };
-
 	this->m_FragmentShaderFunc = 0;
 	this->m_VertexShaderFunc = 0;
 
-	this->m_DepthBuffer = new float[800*600];
-
-	for (int i = 0; i < 800 * 600; i++)
-		this->m_DepthBuffer[i] = 1.0f;
+	// Initialize depth buffer
+	this->m_DepthBuffer = new float[windowWidth * windowHeight];
+	for (int i = 0; i < windowWidth * windowHeight; i++)
+		this->m_DepthBuffer[i] = INT_MAX;
 }
 
 void Rasterizer::setScissorRect(int x, int y, int width, int height)
@@ -52,6 +45,176 @@ void Rasterizer::setDepthRange(float near, float far)
 	this->m_NearPlane = near;
 	this->m_FarPlane = far;
 }
+
+void Rasterizer::loadModelIntoVertexArray(const char* modelPath, char* texturePath, std::vector<VertexArrayData>& vertexArrayDataRef, std::vector<int>& indexDataRef)
+{
+	std::vector<VertexIndexData> typedef Face;
+
+	// Intermediary storage of data read from file
+	std::vector<vec3f> vertices;
+	std::vector<vec3f> normals;
+	std::vector<vec2f> texcoords;
+	std::vector<Face> faces;
+
+	vertices.clear();
+	normals.clear();
+	texcoords.clear();
+	faces.clear();
+
+	vertices.push_back(vec3f(0.0f));
+	normals.push_back(vec3f(0.0f));
+	texcoords.push_back(vec2f(0.0));
+
+	std::ifstream input(modelPath, std::ios::in);
+
+	// Iterate over file
+	while (input)
+	{
+		// Fetch next line in file
+		std::string line;
+		std::getline(input, line);
+
+		std::istringstream iss;
+		iss.str(line);
+
+		std::string cmd;
+		iss >> cmd;
+
+		if (cmd[0] == '#')
+		{
+			continue;
+		}
+		else if (cmd == "v") // This line contains a vertex
+		{
+			vec3f vertex;
+			iss >> vertex.x >> vertex.y >> vertex.z;
+
+			vertices.push_back(vertex);
+		}
+		else if (cmd == "vn") // This line contains a normal
+		{
+			vec3f normal;
+			iss >> normal.x >> normal.y >> normal.z;
+
+			normals.push_back(normal);
+		}
+		else if (cmd == "vt") // This line contains a texture coordinate
+		{
+			vec2f texcoord;
+			iss >> texcoord.x >> texcoord.y;
+
+			texcoords.push_back(texcoord);
+		}
+		else if (cmd == "f") // This line contains face information
+		{
+			faces.push_back(Face());
+
+			// Get reference of last added face
+			Face& face = faces.back();
+
+			// Iterate over the face
+			while (iss)
+			{
+				std::string word;
+				iss >> word;
+
+				if (word == "")
+					continue;
+
+				VertexIndexData vr;
+
+				std::string v;
+				std::string t;
+				std::string n;
+
+				std::string* tmp[3] = { &v, &t, &n };
+
+				int tidx = 0;
+				std::string* target = tmp[0];
+
+				for (size_t i = 0; i < word.size(); ++i) {
+					if (word[i] == '/') target = tmp[++tidx];
+					else *target += word[i];
+				}
+
+				// input string is supposed to be in the form <vertex_index>/<texture_index>/<normal_index>, 
+				// for example: f 1/1/3 5/9/3 6/10/3 2/11/3
+				std::istringstream iss1(v);
+				vr.vertexIndex = 0;
+				iss1 >> vr.vertexIndex;
+
+				std::istringstream iss2(t);
+				vr.texcoordIndex = 0;
+				iss2 >> vr.texcoordIndex;
+
+				std::istringstream iss3(n);
+				vr.normalIndex = 0;
+				iss3 >> vr.normalIndex;
+
+				face.push_back(vr);
+			}
+
+		}
+	}
+
+	vertexArrayDataRef.clear();
+	indexDataRef.clear();
+
+	// Temporary map of currently seen vertices & indices
+	std::map<VertexIndexData, int, VertexIndexData::VertexIndexDataCompare> vertexIndexMap;
+
+	// Lambda function that returns vertex index
+	auto addVertex = [&vertexArrayDataRef, &vertexIndexMap, &vertices, &normals, &texcoords](const VertexIndexData& vertexRef)
+	{
+		// Assume vertex doesn't exist already
+		int index = (int)vertexIndexMap.size();
+
+		// check if this vertex already exists
+		auto it = vertexIndexMap.find(vertexRef);
+
+		if (it != vertexIndexMap.end())
+		{
+			// It did, return its index
+			index = it->second;
+			return index;
+		}
+
+		vertexIndexMap.insert(std::make_pair(vertexRef, index));
+
+		// It didn't exist so insert new vertex data
+		Rasterizer::VertexArrayData vertexArrayData;
+		vertexArrayData.vertex = vertices[vertexRef.vertexIndex];
+		vertexArrayData.normal = normals[vertexRef.normalIndex];
+		vertexArrayData.texcoord = texcoords[vertexRef.texcoordIndex];
+
+		vertexArrayDataRef.push_back(vertexArrayData);
+		return index;
+	};
+
+	// Lambda function to make a triangle face (3 vertices)
+	auto addFace = [](const int index1, const int index2, const int index3, std::vector<int>& indices)
+	{
+		indices.push_back(index1);
+		indices.push_back(index2);
+		indices.push_back(index3);
+	};
+
+	for (size_t i = 0; i < faces.size(); ++i) {
+
+		unsigned i1 = addVertex(faces[i][0]);
+
+		// make a triangle fan if there are more than 3 vertices
+		for (size_t j = 2; j < faces[i].size(); ++j) {
+
+			unsigned i2 = addVertex(faces[i][j - 1]);
+			unsigned i3 = addVertex(faces[i][j]);
+
+			// Add indices
+			addFace(i1, i2, i3, indexDataRef);
+		}
+	}
+}
+
 
 void Rasterizer::setVertexAttribPointer(int index, int stride, const void* buffer)
 {
@@ -109,7 +272,7 @@ void Rasterizer::clipVertices()
 	std::vector<int> clipMasks;
 	clipMasks.resize(m_VerticesOut.size());
 
-	// Create triangle clip masks
+	// Create triangle clip masks for all vertices
 	for (size_t i = 0; i < m_VerticesOut.size(); i++)
 	{
 		int mask = 0;
@@ -136,8 +299,9 @@ void Rasterizer::clipVertices()
 
 		int clipMask = clipMasks[i0] | clipMasks[i1] | clipMasks[i2];
 
-		PolygonClipper polygonClipper = PolygonClipper(&m_VerticesOut, i0, i1, i2, m_VertexVarCount);
+		ViewFrustumClipper polygonClipper = ViewFrustumClipper(&m_VerticesOut, i0, i1, i2, m_VertexVarCount);
 
+		// Clip against planes using the mask
 		if (clipMask & ClipMask::PosX) polygonClipper.clipToPlane(-1, 0, 0, 1);
 		if (clipMask & ClipMask::NegX) polygonClipper.clipToPlane(1, 0, 0, 1);
 		if (clipMask & ClipMask::PosY) polygonClipper.clipToPlane(0, -1, 0, 1);
@@ -145,6 +309,7 @@ void Rasterizer::clipVertices()
 		if (clipMask & ClipMask::PosZ) polygonClipper.clipToPlane(0, 0, -1, 1);
 		if (clipMask & ClipMask::NegZ) polygonClipper.clipToPlane(0, 0, 1, 1);
 
+		// Triangle fully outside clipping plane, discard
 		if (polygonClipper.fullyClipped())
 		{
 			m_VertexIndicesOut[i] = -1;
@@ -269,7 +434,7 @@ void Rasterizer::drawTriangles(int count, int* indices)
 	// Process each vertex in a vertex shader e.g to transform 
 	processVertices(count, indices);
 
-	// Clip vertices outside of view frustum and build new index list
+	// Cull/clip vertices outside of view frustum and build new index list
 	clipVertices();
 
 	// Transform vertices into screen space

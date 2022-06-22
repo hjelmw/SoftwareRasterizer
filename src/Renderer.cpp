@@ -9,20 +9,31 @@
 
 Renderer::Renderer() 
 {
-	//m_Rasterizer = &Rasterizer();
-
-	//m_Vertices.clear();
-	//m_Indices.clear();
+	m_Rasterizer = &Rasterizer();
+	SDL_Init(SDL_INIT_VIDEO);
 }
 
 Renderer::~Renderer()
 {
-	//delete m_Rasterizer;
+	delete m_Rasterizer;
+
+	
 }
 
-void Renderer::Init(const int screenWidth, const int screenHeight, const void* vertexShader, const void* fragmentShader)
-{
 
+void Renderer::Init(const int screenWidth, const int screenHeight, void* vertexShader, const void* fragmentShader)
+{
+	SDL_Window* window = SDL_CreateWindow(
+		"Software Rasterizer",
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED,
+		800,
+		600,
+		0
+	);
+
+	m_RenderSurface = SDL_GetWindowSurface(window);
+	
 }
 
 

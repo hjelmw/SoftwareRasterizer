@@ -3,9 +3,18 @@
 #include "Vertex.hpp"
 #include "VectorMath.hpp"
 
-/// Base class for vertex shaders.
 
-/** Derive your own vertex shaders from this class and redefine attribCount etc. */
+
+//
+//						Vertex shader base class. 
+//
+//		Derive your own pixel shaders from this class and redefine the static
+//		variables to match your vertex shader requirements.
+// 
+//		See Main.cpp for an example
+//
+
+
 
 template <class Derived>
 class VertexShaderBase {

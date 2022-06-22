@@ -2,10 +2,19 @@
 
 #include "TriangleEquations.hpp"
 
+
+//
+//					Fragment shader data
+// 
+//		Class containing vertex interpolated per pixel data.
+//		Used by fragment shader to draw into main buffer
+//
+
+
+
 class FragmentData
 {
 public:
-	// Class containing per pixel data used by fragment shader
 
 	float x; /// pixel x coordinate in triangle.
 	float y; /// pixel y coordinate in triangle.

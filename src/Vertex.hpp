@@ -1,6 +1,14 @@
 #pragma once
 
 
+
+//
+//									Vertex
+//		A handy Vertex class definition with support for per vertex variables
+//
+
+
+
 class Vertex
 {
 public:
@@ -13,7 +21,7 @@ public:
 	float g;
 	float b;
 
-	/// Maximum per vertex variables used for interpolation across the triangle.
+	/// Maximum per vertex variables. Can be interpolated across the triangle (See TriangleEquations file)
 	float var[16];
 
 	Vertex();
