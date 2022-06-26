@@ -9,4 +9,4 @@ The application is written entirely in C++ and apart from window management with
 
 While developing I used 3 main resources: Trenki's excellent blog post on [developing a software renderer](https://trenki2.github.io/blog/2017/06/06/developing-a-software-renderer-part1/), JavidX9's Youtube series [Code-It-Yourself! 3D Graphics Engine](https://www.youtube.com/watch?v=ih20l3pJoeU), and many chapters of the online book [Scratchapixel](https://www.scratchapixel.com/index.php?redirect). When writing the code, I tried to closely follow the concepts of the graphics pipeline so that the application would behave in a similar manner to a GPU accelerated Graphics API.
 
-To see how it works, have a look
+To see how it can be used, have a look in the [Main.cpp](https://github.com/hjelmw/SoftwareRasterizer/blob/master/src/Main.cpp) file! The entrypoint for rasterization is in `Rasterizer::drawTriangles` found [here](https://github.com/hjelmw/SoftwareRasterizer/blob/a839aaed5694e1d921fe6d82629a532b7768a0c8/src/Rasterizer.cpp#L429)
