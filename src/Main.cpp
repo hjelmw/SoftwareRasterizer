@@ -1,28 +1,47 @@
 #include "SDL.h"
 
 #include "Rasterizer.hpp"
-#include "Renderer.hpp"
-#include <stdlib.h>     /* srand, rand */
+#include "InputOutputManager.hpp"
+
 #include<vector>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
+struct VertexArrayData {
+	vmath::vec3<float> vertex;
+	vmath::vec3<float> normal;
+	vmath::vec2<float> texcoord;
+};
 
 class BasicVertexShader : public VertexShaderBase<BasicVertexShader> {
 public:
 	static const int attribCount = 1;
 	static const int varCount = 5;
 
-	// Declare mvp matrix so we can use it
 	static mat4f modelViewProjectionMatrix;
+	static mat4f transformMatrix;
 
 	static void processVertex(void* in[], Vertex* out)
 	{
 		const Rasterizer::VertexArrayData* vertexData = static_cast<const Rasterizer::VertexArrayData*>(in[0]);
 
+		vec3f translation = vec3f(transformMatrix.elem[3][0], transformMatrix.elem[3][1], transformMatrix.elem[3][2]);
+
+
+		float elapsedTime = SDL_GetTicks() / 1000.0f;
+
+		mat3f rotationY = mat3f(
+			vec3f(cos(elapsedTime), 0, -sin(elapsedTime)), // col 0
+			vec3f(0, 1, 0), // col 1
+			vec3f(sin(elapsedTime), 0, cos(elapsedTime)) // col 2
+		);
+
+		vec3f transformed_vertex = vertexData->vertex;//* rotationY;
+
+
 		// Bring vertex into clip space
-		vec4f position = modelViewProjectionMatrix * vec4f(vertexData->vertex, 1.0f);
+		vec4f position = modelViewProjectionMatrix * vec4f(transformed_vertex, 1.0f);
 
 		out->x = position.x;
 		out->y = position.y;
@@ -74,6 +93,7 @@ public:
 SDL_Surface* BasicFragmentShader::surface;
 
 mat4f BasicVertexShader::modelViewProjectionMatrix;
+mat4f BasicVertexShader::transformMatrix;
 
 int main(int argc, char* argv[])
 {
@@ -92,10 +112,10 @@ int main(int argc, char* argv[])
 	// This is the main buffer we will draw into
 	SDL_Surface* renderSurface = SDL_GetWindowSurface(window);
 
-	Rasterizer softwareRasterizer(WINDOW_HEIGHT, WINDOW_WIDTH);
+	Rasterizer softwareRasterizer(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	// Setup matrices
-	mat4f lookAtMatrix = vmath::lookat_matrix(
+	mat4f lookAtMatrix2 = vmath::lookat_matrix(
 		vec3f(2.0f, 1.0f, 1.5f), // Camera position XYZ
 		vec3f(0.0f, 0.0f, 0.0f), // Look at origin
 		vec3f(0.0f, 1.0f, 0.0f)); // Y-axis up
@@ -106,8 +126,8 @@ int main(int argc, char* argv[])
 		10.0f); // Far plane
 	
 	// Setup shader constants
-	BasicVertexShader::modelViewProjectionMatrix = perspectiveMatrix * lookAtMatrix;
-	BasicFragmentShader::surface = renderSurface;
+	//BasicVertexShader::modelViewProjectionMatrix = perspectiveMatrix * lookAtMatrix;
+	//BasicFragmentShader::surface = renderSurface;
 
 	// Configure rasterizer
 	softwareRasterizer.setScissorRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -119,17 +139,48 @@ int main(int argc, char* argv[])
 	// Load vertices into rasterizer
 	std::vector<Rasterizer::VertexArrayData> vertexData;
 	std::vector<int> indexData;
-	softwareRasterizer.loadModelIntoVertexArray("data/monkey.obj", "data/box.png", vertexData, indexData);
+
+	mat4f objectWorld1 = mat4f(
+		vec4f(0.70f, 0.0f, 0.70f, 0.0f), // Rotation
+		vec4f(0.0f, 1.0f, 0.0f, 0.0f),
+		vec4f(-0.70f, 0.0f, 0.70f, 0.0f),
+		vec4f(0.0f, 0.0f, 3.0f, 1.0f) // Translation
+	);
+
+	softwareRasterizer.loadModelIntoVertexArray("data/monkey.obj", "data/box.png", objectWorld1, vertexData, indexData);
 	softwareRasterizer.setVertexAttribPointer(0, sizeof(Rasterizer::VertexArrayData), &vertexData[0]);
 
-	// Draw into buffer
-	softwareRasterizer.drawTriangles((int)indexData.size(), &indexData[0]);
 
-	// Flip it!
-	SDL_UpdateWindowSurface(window);
+	InputOutputManager inputOutputManager = InputOutputManager();
 
-	SDL_Event e;
-	while (SDL_WaitEvent(&e) && e.type != SDL_QUIT);
+
+	mat4f inputMatrix = vmath::identity4<float>();
+
+	mat4f lookAtMatrix;
+
+	while (true)
+	{
+		SDL_FillRect(renderSurface, NULL, 0x00000000);
+
+		float elapsedTime = ((float)SDL_GetTicks()) / 1000.0f;
+
+		inputOutputManager.processInput();
+		inputOutputManager.updateCameraTransforms(lookAtMatrix, 0.1f);
+
+
+		BasicVertexShader::modelViewProjectionMatrix = perspectiveMatrix * lookAtMatrix;
+		BasicVertexShader::transformMatrix = inputMatrix;
+		BasicFragmentShader::surface = renderSurface;
+
+
+
+		// Draw into buffer
+		softwareRasterizer.drawTriangles((int)indexData.size(), &indexData[0]);
+
+		SDL_UpdateWindowSurface(window);
+
+
+	}
 
 	SDL_DestroyWindow(window);
 	SDL_Quit();

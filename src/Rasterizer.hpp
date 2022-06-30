@@ -35,7 +35,11 @@
 //		as well as programmable vertex & fragment shaders!
 //
 
-
+typedef vmath::vec3<float> vec3f;
+typedef vmath::vec2<float> vec2f;
+typedef vmath::vec4<float> vec4f;
+typedef vmath::mat3<float> mat3f;
+typedef vmath::mat4<float> mat4f;
 
 class Rasterizer
 {
@@ -178,7 +182,7 @@ public:
 	void setDepthRange(float near, float far);
 
 	// Loads a .obj into struct VertexArrayData
-	void loadModelIntoVertexArray(const char* modelPath, char* texturePath, std::vector<Rasterizer::VertexArrayData>& vertexDataRef, std::vector<int>& indexDataRef);
+	void loadModelIntoVertexArray(const char* modelPath, char* texturePath, mat4f modelTransforms, std::vector<Rasterizer::VertexArrayData>& vertexDataRef, std::vector<int>& indexDataRef);
 
 	/* Note: Template functions need to be defined in the header file */
 
@@ -261,7 +265,7 @@ private:
 		{
 			if (teqn.e0.test(x, y) && teqn.e1.test(x, y) && teqn.e2.test(x, y))
 			{
-				float currentDepthAtPixel = m_DepthBuffer[(int) (y * m_MaxX + x)]; // row * rows + col
+				float currentDepthAtPixel = m_DepthBuffer[(int) ((y-0.5f) * m_MaxX + (x-0.5f))]; // row * rows + col
 				FragmentData fragmentData = FragmentData(teqn, x, y, FragmentShader::varCount, FragmentShader::interpolateZ, FragmentShader::interpolateW);
 
 				// Only draw fragment if its depth is above (in front) what is currently stored.
@@ -270,10 +274,10 @@ private:
 					FragmentShader::processFragment(fragmentData);
 
 					// Update current stored depth at this pixel
-					this->m_DepthBuffer[(int) (y * m_MaxX + x)] = fragmentData.z;
+					this->m_DepthBuffer[(int) ((y - 0.5f) * m_MaxX + (x - 0.5f))] = fragmentData.z;
 				}
 			}
 		}
 	}
 };
-	///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
