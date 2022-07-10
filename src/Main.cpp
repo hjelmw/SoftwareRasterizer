@@ -157,22 +157,27 @@ int main(int argc, char* argv[])
 	mat4f inputMatrix = vmath::identity4<float>();
 
 	mat4f lookAtMatrix;
+	
+	float lastTime = ((float)SDL_GetTicks()) / 1000.0f;
 
 	while (true)
 	{
 		SDL_FillRect(renderSurface, NULL, 0x00000000);
 
-		float elapsedTime = ((float)SDL_GetTicks()) / 1000.0f;
+
+		float newTime = ((float)SDL_GetTicks()) / 1000.0f;
+		float deltaTime = newTime - lastTime;
+
+		deltaTime = deltaTime * 1.0f;
+		lastTime = newTime;
 
 		inputOutputManager.processInput();
-		inputOutputManager.updateCameraTransforms(lookAtMatrix, 0.1f);
+		inputOutputManager.updateCameraTransforms(lookAtMatrix, deltaTime);
 
 
 		BasicVertexShader::modelViewProjectionMatrix = perspectiveMatrix * lookAtMatrix;
 		BasicVertexShader::transformMatrix = inputMatrix;
 		BasicFragmentShader::surface = renderSurface;
-
-
 
 		// Draw into buffer
 		softwareRasterizer.drawTriangles((int)indexData.size(), &indexData[0]);

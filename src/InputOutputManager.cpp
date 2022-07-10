@@ -133,6 +133,8 @@ void InputOutputManager::processInput()
 
 void InputOutputManager::updateCameraTransforms(mat4f& cameraMatrix, float dt)
 {
+	float sensitivity = 0.2f;
+
 	if (m_MouseStatus.rightButton)
 	{
 
@@ -151,8 +153,8 @@ void InputOutputManager::updateCameraTransforms(mat4f& cameraMatrix, float dt)
 		float offsetX = (float) previousMouseX - currentMouseX;
 		float offsetY = (float) currentMouseY - previousMouseY;
 
-		offsetX *= dt;
-		offsetY *= dt;
+		offsetX *= (dt + sensitivity);
+		offsetY *= (dt + sensitivity);
 
 		m_CameraTransforms.yaw += offsetX;
 		m_CameraTransforms.pitch += offsetY;
@@ -176,34 +178,32 @@ void InputOutputManager::updateCameraTransforms(mat4f& cameraMatrix, float dt)
 	lookDirection.y = -sin(pitchRadians);
 	lookDirection.z = -cos(yawRadians) * cos(pitchRadians);
 
-	
-
 	vec3f cameraFront = lookDirection;
 	vmath::normalize(cameraFront);
 
 	if (m_KeyStatus.forward)
 	{
-		m_CameraTransforms.cameraPosition += cameraFront * dt;
+		m_CameraTransforms.cameraPosition += cameraFront * (dt + sensitivity);
 	}
 	if (m_KeyStatus.backward)
 	{
-		m_CameraTransforms.cameraPosition -= cameraFront * dt;
+		m_CameraTransforms.cameraPosition -= cameraFront * (dt + sensitivity);
 	}
 	if (m_KeyStatus.up)
 	{
-		m_CameraTransforms.cameraPosition.y += 1.0f * dt;
+		m_CameraTransforms.cameraPosition.y += 1.0f * (dt + sensitivity);
 	}
 	if (m_KeyStatus.down)
 	{
-		m_CameraTransforms.cameraPosition.y -= 1.0f * dt;
+		m_CameraTransforms.cameraPosition.y -= 1.0f * (dt + sensitivity);
 	}
 	if (m_KeyStatus.left)
 	{
-		m_CameraTransforms.cameraPosition -= vmath::normalize(vmath::cross(cameraFront, vec3f(0.0f, 1.0f, 0.0f))) * dt;
+		m_CameraTransforms.cameraPosition -= vmath::normalize(vmath::cross(cameraFront, vec3f(0.0f, 1.0f, 0.0f))) * (dt + sensitivity);
 	}
 	if (m_KeyStatus.right)
 	{
-		m_CameraTransforms.cameraPosition += vmath::normalize(vmath::cross(cameraFront, vec3f(0.0f, 1.0f, 0.0f))) * dt;
+		m_CameraTransforms.cameraPosition += vmath::normalize(vmath::cross(cameraFront, vec3f(0.0f, 1.0f, 0.0f))) * (dt + sensitivity);
 	}
 
 
