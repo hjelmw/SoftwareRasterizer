@@ -44,7 +44,7 @@ void Rasterizer::setDepthRange(float near, float far)
 	this->m_FarPlane = far;
 }
 
-void Rasterizer::loadModelIntoVertexArray(const char* modelPath, char* texturePath, mat4f modelTransforms, std::vector<VertexArrayData>& vertexArrayDataRef, std::vector<int>& indexDataRef)
+bool Rasterizer::loadModelIntoVertexArray(const char* modelPath, char* texturePath, mat4f modelTransforms, std::vector<VertexArrayData>& vertexArrayDataRef, std::vector<int>& indexDataRef)
 {
 	std::vector<VertexIndexData> typedef Face;
 
@@ -215,6 +215,8 @@ void Rasterizer::loadModelIntoVertexArray(const char* modelPath, char* texturePa
 			addFace(i1, i2, i3, indexDataRef);
 		}
 	}
+
+	return !vertexArrayDataRef.empty();
 }
 
 

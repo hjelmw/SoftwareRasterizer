@@ -182,7 +182,7 @@ public:
 	void setDepthRange(float near, float far);
 
 	// Loads a .obj into struct VertexArrayData
-	void loadModelIntoVertexArray(const char* modelPath, char* texturePath, mat4f modelTransforms, std::vector<Rasterizer::VertexArrayData>& vertexDataRef, std::vector<int>& indexDataRef);
+	bool loadModelIntoVertexArray(const char* modelPath, char* texturePath, mat4f modelTransforms, std::vector<Rasterizer::VertexArrayData>& vertexDataRef, std::vector<int>& indexDataRef);
 
 	/* Note: Template functions need to be defined in the header file */
 

@@ -18,7 +18,8 @@ ViewFrustumClipper::ViewFrustumClipper(std::vector<Vertex>* vertices, int i1, in
 
 ViewFrustumClipper::~ViewFrustumClipper()
 {
-
+	delete m_IndicesIn;
+	delete m_IndicesOut;
 }
 
 std::vector<int>& ViewFrustumClipper::getIndices()

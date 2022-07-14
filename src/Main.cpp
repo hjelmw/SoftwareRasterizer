@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 		90.0f, // FOV 
 		4.0f / 3.0f, // Aspect ratio
 		0.1f, // Near plane
-		10.0f); // Far plane
+		100.0f); // Far plane
 	
 	// Setup shader constants
 	//BasicVertexShader::modelViewProjectionMatrix = perspectiveMatrix * lookAtMatrix;
@@ -147,9 +147,15 @@ int main(int argc, char* argv[])
 		vec4f(0.0f, 0.0f, 3.0f, 1.0f) // Translation
 	);
 
-	softwareRasterizer.loadModelIntoVertexArray("data/monkey.obj", "data/box.png", objectWorld1, vertexData, indexData);
-	softwareRasterizer.setVertexAttribPointer(0, sizeof(Rasterizer::VertexArrayData), &vertexData[0]);
+	bool result = softwareRasterizer.loadModelIntoVertexArray("scenes/newship.obj", "data/box.png", objectWorld1, vertexData, indexData);
 
+	if (!result)
+	{
+		std::cout << "Could not load file";
+		exit(-1);
+	}
+
+	softwareRasterizer.setVertexAttribPointer(0, sizeof(Rasterizer::VertexArrayData), &vertexData[0]);
 
 	InputOutputManager inputOutputManager = InputOutputManager();
 
