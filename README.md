@@ -15,3 +15,15 @@ The renderer additionally supports some nice to have features such as arbitrary 
 While developing I used 3 main resources: Trenki's excellent blog post on [Developing a Software Renderer](https://trenki2.github.io/blog/2017/06/06/developing-a-software-renderer-part1/), JavidX9's Youtube series [Code-It-Yourself! 3D Graphics Engine](https://www.youtube.com/watch?v=ih20l3pJoeU), and many chapters of the online book [Scratchapixel](https://www.scratchapixel.com/index.php?redirect). When writing the code, I tried to closely follow the concepts of the graphics pipeline so that the application would behave in a similar manner to a GPU accelerated Graphics API.
 
 To see how it can be used, have a look in the [Main.cpp](https://github.com/hjelmw/SoftwareRasterizer/blob/master/src/Main.cpp) file! The entrypoint for rasterization is in `Rasterizer::drawTriangles` found [here](https://github.com/hjelmw/SoftwareRasterizer/blob/a839aaed5694e1d921fe6d82629a532b7768a0c8/src/Rasterizer.cpp#L429)
+
+
+## Setup
+1. Download [Simple DirectMedia Layer](https://www.libsdl.org/index.php)
+2. Open Cmake in the root directory
+3. Configure and point it to SDL lib and include folder
+4. Copy SDL2.dll to where you will build the binaries, e.g `SoftwareRasterizer/build`
+5. Additionally place your .obj file inside the same build folder
+6. Correct the file path in `Rasterizer::loadModelIntoVertexArray()`
+7. Compile and run! 
+
+`WASD` as well as `RF` translates the camera. Additionally by holding down the right mouse button you can orient yourself in the scene
