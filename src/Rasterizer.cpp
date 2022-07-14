@@ -44,7 +44,7 @@ void Rasterizer::setDepthRange(float near, float far)
 	this->m_FarPlane = far;
 }
 
-bool Rasterizer::loadModelIntoVertexArray(const char* modelPath, char* texturePath, mat4f modelTransforms, std::vector<VertexArrayData>& vertexArrayDataRef, std::vector<int>& indexDataRef)
+bool Rasterizer::loadModelIntoVertexArray(const char* modelPath, char* texturePath, std::vector<VertexArrayData>& vertexArrayDataRef, std::vector<int>& indexDataRef)
 {
 	std::vector<VertexIndexData> typedef Face;
 
@@ -162,7 +162,7 @@ bool Rasterizer::loadModelIntoVertexArray(const char* modelPath, char* texturePa
 	std::map<VertexIndexData, int, VertexIndexData::VertexIndexDataCompare> vertexIndexMap;
 
 	// Lambda function that returns vertex index
-	auto addVertex = [&vertexArrayDataRef, &modelTransforms, &vertexIndexMap, &vertices, &normals, &texcoords](const VertexIndexData& vertexRef)
+	auto addVertex = [&vertexArrayDataRef, &vertexIndexMap, &vertices, &normals, &texcoords](const VertexIndexData& vertexRef)
 	{
 		// Assume vertex doesn't exist already
 		int index = (int)vertexIndexMap.size();
@@ -184,10 +184,6 @@ bool Rasterizer::loadModelIntoVertexArray(const char* modelPath, char* texturePa
 		vertexArrayData.vertex = vertices[vertexRef.vertexIndex];
 		vertexArrayData.normal = normals[vertexRef.normalIndex];
 		vertexArrayData.texcoord = texcoords[vertexRef.texcoordIndex];
-
-		//vec4f transformedVertex = vec4f(vertexArrayData.vertex, 1.0f) * modelTransforms;
-		vec3f transformedVertex = vertexArrayData.vertex + vec3f(3.0f, 0.0f, 0.0f);
-		vertexArrayData.vertex = vec3f(transformedVertex.x, transformedVertex.y, transformedVertex.z);
 
 		vertexArrayDataRef.push_back(vertexArrayData);
 		return index;

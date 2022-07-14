@@ -133,7 +133,7 @@ void InputOutputManager::processInput()
 
 void InputOutputManager::updateCameraTransforms(mat4f& cameraMatrix, float dt)
 {
-	float sensitivity = 0.2f;
+	float sensitivity = 0.45f;
 
 	if (m_MouseStatus.rightButton)
 	{
