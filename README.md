@@ -1,4 +1,4 @@
-# Software Rasterizer/Renderer
+# Real Time Software Rasterizer/Renderer
 
 To better understand the nitty gritty details of the [Graphics Pipeline](https://en.wikipedia.org/wiki/Graphics_pipeline) I decided to build my own _software_ renderer/rasterizer as a hobby project.
 
