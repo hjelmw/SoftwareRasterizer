@@ -18,7 +18,7 @@ To see how it can be used, have a look in the [Main.cpp](https://github.com/hjel
 
 
 ## Setup
-1. Download [Simple DirectMedia Layer](https://www.libsdl.org/index.php)
+1. Download the [Simple DirectMedia Layer SDK](https://www.libsdl.org/index.php) 
 2. Open Cmake in the root directory
 3. Configure and point it to SDL lib and include folder
 4. Copy SDL2.dll to where you will build the binaries, e.g `SoftwareRasterizer/build`
