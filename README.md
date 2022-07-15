@@ -18,6 +18,9 @@ To see how it can be used, have a look in the [Main.cpp](https://github.com/hjel
 
 
 ## Setup
+**Run Rasterizer.exe** in the `samples/` folder
+
+Or build it locally
 1. Download the [Simple DirectMedia Layer SDK](https://www.libsdl.org/index.php) 
 2. Open Cmake in the root directory
 3. Configure and point it to SDL lib and include folder
