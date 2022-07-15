@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
 		vec4f(0.0f, 0.0f, 3.0f, 1.0f) // Translation
 	);
 
-	bool result = softwareRasterizer.loadModelIntoVertexArray("scenes/newship.obj", "", objectWorld1, vertexData, indexData);
+	bool result = softwareRasterizer.loadModelIntoVertexArray("scenes/newship.obj", "", vertexData, indexData);
 
 	if (!result)
 	{
