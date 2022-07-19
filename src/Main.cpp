@@ -28,17 +28,17 @@ public:
 
 		vec3f translation = vec3f(transformMatrix.elem[3][0], transformMatrix.elem[3][1], transformMatrix.elem[3][2]);
 
-
+		// Unomment line 41 to make model spin around y-axis!
 		float elapsedTime = SDL_GetTicks() / 1000.0f;
-
 		mat3f rotationY = mat3f(
 			vec3f(cos(elapsedTime), 0, -sin(elapsedTime)), // col 0
 			vec3f(0, 1, 0), // col 1
 			vec3f(sin(elapsedTime), 0, cos(elapsedTime)) // col 2
 		);
 
-		vec3f transformed_vertex = vertexData->vertex;//* rotationY;
-
+		vec3f transformed_vertex = vertexData->vertex;
+		
+		//vec3f transformed_vertex *= rotationY;
 
 		// Bring vertex into clip space
 		vec4f position = modelViewProjectionMatrix * vec4f(transformed_vertex, 1.0f);
@@ -111,11 +111,12 @@ int main(int argc, char* argv[])
 
 	// This is the main buffer we will draw into
 	SDL_Surface* renderSurface = SDL_GetWindowSurface(window);
-
+	
 	Rasterizer softwareRasterizer(WINDOW_WIDTH, WINDOW_HEIGHT);
+	InputOutputManager inputOutputManager = InputOutputManager();
 
 	// Setup matrices
-	mat4f lookAtMatrix2 = vmath::lookat_matrix(
+	mat4f lookAtMatrix = vmath::lookat_matrix(
 		vec3f(2.0f, 1.0f, 1.5f), // Camera position XYZ
 		vec3f(0.0f, 0.0f, 0.0f), // Look at origin
 		vec3f(0.0f, 1.0f, 0.0f)); // Y-axis up
@@ -125,10 +126,6 @@ int main(int argc, char* argv[])
 		0.1f, // Near plane
 		100.0f); // Far plane
 	
-	// Setup shader constants
-	//BasicVertexShader::modelViewProjectionMatrix = perspectiveMatrix * lookAtMatrix;
-	//BasicFragmentShader::surface = renderSurface;
-
 	// Configure rasterizer
 	softwareRasterizer.setScissorRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	softwareRasterizer.setViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -139,14 +136,7 @@ int main(int argc, char* argv[])
 	// Load vertices into rasterizer
 	std::vector<Rasterizer::VertexArrayData> vertexData;
 	std::vector<int> indexData;
-
-	mat4f objectWorld1 = mat4f(
-		vec4f(0.70f, 0.0f, 0.70f, 0.0f), // Rotation
-		vec4f(0.0f, 1.0f, 0.0f, 0.0f),
-		vec4f(-0.70f, 0.0f, 0.70f, 0.0f),
-		vec4f(0.0f, 0.0f, 3.0f, 1.0f) // Translation
-	);
-
+	
 	bool result = softwareRasterizer.loadModelIntoVertexArray("scenes/newship.obj", "", vertexData, indexData);
 
 	if (!result)
@@ -156,41 +146,28 @@ int main(int argc, char* argv[])
 	}
 
 	softwareRasterizer.setVertexAttribPointer(0, sizeof(Rasterizer::VertexArrayData), &vertexData[0]);
-
-	InputOutputManager inputOutputManager = InputOutputManager();
-
-
-	mat4f inputMatrix = vmath::identity4<float>();
-
-	mat4f lookAtMatrix;
 	
 	float lastTime = ((float)SDL_GetTicks()) / 1000.0f;
-
 	while (true)
 	{
 		SDL_FillRect(renderSurface, NULL, 0x00000000);
 
-
 		float newTime = ((float)SDL_GetTicks()) / 1000.0f;
 		float deltaTime = newTime - lastTime;
-
-		deltaTime = deltaTime * 1.0f;
 		lastTime = newTime;
 
+		// Update camera matrix based on user input
 		inputOutputManager.processInput();
 		inputOutputManager.updateCameraTransforms(lookAtMatrix, deltaTime);
 
-
+		// Setup camera and render surface for shaders
 		BasicVertexShader::modelViewProjectionMatrix = perspectiveMatrix * lookAtMatrix;
-		BasicVertexShader::transformMatrix = inputMatrix;
 		BasicFragmentShader::surface = renderSurface;
 
 		// Draw into buffer
 		softwareRasterizer.drawTriangles((int)indexData.size(), &indexData[0]);
 
 		SDL_UpdateWindowSurface(window);
-
-
 	}
 
 	SDL_DestroyWindow(window);
