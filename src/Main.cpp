@@ -38,7 +38,7 @@ public:
 
 		vec3f transformed_vertex = vertexData->vertex;
 		
-		//vec3f transformed_vertex *= rotationY;
+		//transformed_vertex = transformed_vertex * rotationY;
 
 		// Bring vertex into clip space
 		vec4f position = modelViewProjectionMatrix * vec4f(transformed_vertex, 1.0f);
